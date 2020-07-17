@@ -1,0 +1,13 @@
+[adafruit]
+USERNAME = Your name
+KEY = asdfgsdfgadfgsdfg
+
+[influxdb]
+HOST = 192.160.0.100
+PORT = 8086
+PASSWORD = secret
+USERNAME = username
+DATABASE = db_name
+
+[filesystem]
+FILENAME = /tmp/sensor_data.json
