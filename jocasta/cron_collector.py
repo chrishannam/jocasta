@@ -4,7 +4,7 @@ Generic collector code to run config file
 
 from jocasta.inputs.serial_connector import SerialSensor
 
-from jocasta.connectors import file_system
+from jocasta.connectors import file_system, io_adafruit
 
 # io_adafruit, influx
 from jocasta.command_line.setup import setup_config, convert_config_stanza
@@ -29,15 +29,14 @@ def main(port):
 
     reading = sensor_reader.read()
     logging.info(reading)
-    connectors = {}
+    connectors = []
 
     for name, section in config.items():
-        print(name)
         args = convert_config_stanza(section)
         if name == 'file_system':
-            connectors['file_system'] = file_system.FileSystemConnector(**args)
-        # elif name == 'adafruit':
-        #     connectors['adafruit'] = io_adafruit.IOAdafruitConnector(**args)
+            connectors.append(file_system.FileSystemConnector(**args))
+        elif name == 'adafruit':
+            connectors.append(io_adafruit.IOAdafruitConnector(**args))
         # elif name == 'influxdb':
         #     connectors['influxdb'] = influx.InfluxDBConnector(**args)
     # elif name == 'file_system':
@@ -50,7 +49,9 @@ def main(port):
     #     conn = file_system.FileSystemConnector(setting)
     # elif name == 'INFLUXDB':
     #     conn = influx.InfluxDBConnector(setting)
-    connectors['file_system'].send(data=reading)
+
+    for connector in connectors:
+        connector.send(data=reading)
 
 
 if __name__ == '__main__':

@@ -1,30 +1,14 @@
 from Adafruit_IO import Client
 
-try:
-    from settings import SERVICES
-except ImportError:
-    # service not configured
-    pass
-
 
 class IOAdafruitConnector(object):
-
-    def __init__(self, api_key=None):
-
-        if not api_key:
-            api_key =  SERVICES['ADAFRUITIO_KEY']
-
-        self.aio = Client(api_key)
+    def __init__(self, key, username, feeds) -> None:
+        self.aio = Client(username=username, key=key)
+        self.feeds = feeds
 
     def send(self, data):
-        # send data to dweet
+        for feed in self.feeds.split(','):
+            aio_feed = self.aio.feeds(feed)
+            self.aio.send_data(aio_feed.key, data[feed])
 
-        try:
-            for key, value in data.iteritems():
-                self.aio.send(key, value)
-
-            response = {'status': 'ok'}
-        except Exception as exception:
-            response = {'error': exception.message}
-
-        return response
+        return {'status': 'ok'}
