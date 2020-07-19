@@ -1,15 +1,11 @@
-""" Simple class to write json out to a file
-"""
 import json
-from settings import SERVICES
 
 
 class FileSystemConnector(object):
-
     def __init__(self, file_name=None):
 
         if not file_name:
-            file_name =  SERVICES['FILE_SYSTEM_PATH']
+            file_name = '/tmp/jocasta.json'
 
         self.file_name = file_name
 

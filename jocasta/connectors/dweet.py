@@ -1,17 +1,8 @@
 import dweepy
 
-try:
-    from settings import SERVICES
-except ImportError:
-    # service not configured
-    pass
 
 class DweetConnector(object):
-
     def __init__(self, dweet_name=None):
-
-        if not dweet_name:
-            dweet_name = services['DWEET_NAME']
 
         self.dweet_name = dweet_name
 

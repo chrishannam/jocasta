@@ -10,35 +10,45 @@ sensor = SerialSensor(port='ttyUSB0', json_data=False)
 
 import glob
 import json
+import logging
+from json import JSONDecodeError
+
 import serial
 import os.path
 import time
 
 # usual linux ports
-PORTS = ['ttyUSB0', 'ttyAMA0', 'ttyACM0']
-OSX_PORTS = ['tty.usbserial-*']
-SERIAL_PORT_PATH_ROOT = '/dev/'
+PORTS = ["ttyUSB0", "ttyUSB1", "ttyAMA0", "ttyACM0"]
+SERIAL_PORT_PATH_ROOT = "/dev/"
 
 
-class SerialSensor():
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s.%(msecs)03d %(levelname)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
+logger = logging.getLogger(__name__)
+
+
+class SerialSensor:
     def __init__(self, port=None, json_data=True, debug=True):
         if port:
             self.serial_port = SERIAL_PORT_PATH_ROOT + port
         else:
-            self.serial_port = self._detect_port()
+            logger.info("Finding port.")
+            self.serial_port = _detect_port()
         self.ser = serial.Serial(self.serial_port, 9600, timeout=1)
 
         self.debug = debug
         self.json_data = json_data
 
-        if self.debug:
-            print "Using {} as serial port".format(self.serial_port)
+        logger.debug(f"Using {self.serial_port} as serial port")
 
     def read(self, timeout=10):
 
         if not self.serial_port:
-            print "Unable to find anything on the serial port to read from."
+            logger.error("Unable to find anything on the serial port to read from.")
             return
 
         stop = time.time() + timeout
@@ -47,39 +57,36 @@ class SerialSensor():
         while time.time() < stop:
             i = i + 1
             raw_serial = self.ser.readline()
-            if self.debug:
-                print "Attempt {0}: Received: {1}".format(i, raw_serial)
+
+            logger.debug(f"Attempt {i}: Received: {raw_serial}")
 
             if self.json_data and raw_serial:
                 try:
                     return json.loads(raw_serial)
-                except Exception as exception:
-                    if self.debug:
-                        print "Failed to decode to JSON: {0}".format(
-                            raw_serial)
-                        print exception.message
+                except JSONDecodeError as exception:
+                    logger.debug(f"Failed to decode to JSON: {raw_serial}")
             elif raw_serial:
                 try:
-                    raw_serial = raw_serial.replace('\r\n', '')
-                    return raw_serial.split(',')
+                    raw_serial = str(raw_serial).replace("\r\n", "")
+                    return raw_serial.split(",")
                 except:
                     # keep going we might get lucky
                     pass
             else:
-                if self.debug:
-                    print "Failed to decode anything"
+                logger.debug("Failed to decode anything")
 
-    def _detect_port(self):
 
-        device_path = None
+def _detect_port():
 
-        for port in PORTS:
-            device = SERIAL_PORT_PATH_ROOT + port
-            if os.path.exists(device):
-                device_path = device
+    device_path = None
 
-        if not device_path:
-            # lets try osx stuff
-            for file_name in glob.glob1("/dev", "tty.usbserial-*"):
-                device_path = SERIAL_PORT_PATH_ROOT + file_name
-        return device_path
+    for port in PORTS:
+        device = SERIAL_PORT_PATH_ROOT + port
+        if os.path.exists(device):
+            device_path = device
+
+    if not device_path:
+        # lets try osx stuff
+        for file_name in glob.glob1("/dev", "tty.usbserial-*"):
+            device_path = SERIAL_PORT_PATH_ROOT + file_name
+    return device_path
