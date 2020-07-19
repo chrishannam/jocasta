@@ -10,7 +10,7 @@ setuptools.setup(
     version=jocasta.__version__,
     author='Chris Hannam',
     author_email='ch@chrishannam.co.uk',
-    description='Mental health questionnaires.',
+    description='Fetch sensor data.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/chrishannam/jocasta',
