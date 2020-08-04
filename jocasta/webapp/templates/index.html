@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+        <div class="row">
+          <div class="col-md-4 text-center">
+            <div id="temperature" style="width:350px; height:300px"></div>
+            <p><a class="btn btn-secondary" href="/temperature" role="button">View details &raquo;</a></p>
+          </div>
+
+          <div class="col-md-4 text-center">
+            <div id="humidity" style="width:350px; height:300px"></div>
+            <p><a class="btn btn-secondary" href="/humidity" role="button">View details &raquo;</a></p>
+          </div>
+
+          <div class="col-md-4 text-center">
+            <div id="light" style="width:350px; height:300px"></div>
+            <p><a class="btn btn-secondary" href="/light" role="button">View details &raquo;</a></p>
+          </div>
+        </div>
+{% endblock %}
+
+{% block gauge_script %}
+<script>
+      var temperature = new JustGage({
+        id: "temperature",
+        value: {{reading.temperature}},
+        min: 5,
+        max: 35,
+        title: "Temperature"
+      });
+      var humidity = new JustGage({
+        id: "humidity",
+        value: {{reading.humidity}},
+        min: 0,
+        max: 100,
+        title: "Humidity"
+      });
+      var light = new JustGage({
+        id: "light",
+        value: {{reading.light}},
+        min: 0,
+        max: 450,
+        title: "Light"
+      });
+  </script>
+{% endblock %}

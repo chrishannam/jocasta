@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+        <div class="row">
+          <div class="col-md-2"></div>
+
+          <div class="col-md-8 text-center">
+            <div id="gauge" style="width:600px; height:520px"></div>
+            <p><a class="btn btn-secondary" href="/light" role="button">View details &raquo;</a></p>
+          </div>
+          <div class="col-md-2"></div>
+        </div>
+{% endblock %}
+
+{% block gauge_script %}
+  <script>
+    var light = new JustGage({
+      id: "gauge",
+      value: {{reading.light}},
+      min: 0,
+      max: 450,
+      title: "Light"
+    });
+  </script>
+{% endblock %}
