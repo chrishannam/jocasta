@@ -96,3 +96,5 @@ ENV/
 .ropeproject
 
 jocasta_config.ini
+
+.idea
