@@ -7,13 +7,14 @@ from tabulate import tabulate
 
 from jocasta.inputs.serial_connector import SerialSensor
 
-from jocasta.connectors import file_system
+from jocasta.connectors import file_system, influx
 
 # io_adafruit, influx
 from jocasta.command_line.setup import setup_config, convert_config_stanza
 import click
 import logging
 
+from jocasta.validators import validate_temperature
 
 logging.basicConfig(
     level=logging.INFO,
@@ -40,8 +41,8 @@ def main(port):
             connectors['file_system'] = file_system.FileSystemConnector(**args)
         # elif name == 'adafruit':
         #     connectors['adafruit'] = io_adafruit.IOAdafruitConnector(**args)
-        # elif name == 'influxdb':
-        #     connectors['influxdb'] = influx.InfluxDBConnector(**args)
+        elif name == 'influxdb':
+            connectors['influxdb'] = influx.InfluxDBConnector(**args)
     # elif name == 'file_system':
     #     connectors['file_system'] = file_system.FileSystemConnector(**args)
     # if name == 'DWEET_NAME':
@@ -52,10 +53,16 @@ def main(port):
     #     conn = file_system.FileSystemConnector(setting)
     # elif name == 'INFLUXDB':
     #     conn = influx.InfluxDBConnector(setting)
-    if connectors:
-        connectors['file_system'].send(data=reading)
 
-    display_table(reading)
+    if reading:
+        validate_temperature(
+            reading, convert_config_stanza(config['temperature_ranges'])
+        )
+        display_table(reading)
+        for name, connector in connectors.items():
+            connector.send(data=reading)
+    else:
+        print('Unable to get reading.')
 
 
 def display_table(reading: Dict):

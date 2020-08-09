@@ -11,3 +11,7 @@ DATABASE = db_name
 
 [filesystem]
 FILENAME = /tmp/sensor_data.json
+
+[temperature_ranges]
+maximum = 100.0
+minimum = -10.0
