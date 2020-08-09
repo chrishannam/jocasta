@@ -6,7 +6,7 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name='hippocrates',
+    name='jocasta',
     version=jocasta.__version__,
     author='Chris Hannam',
     author_email='ch@chrishannam.co.uk',
@@ -20,11 +20,16 @@ setuptools.setup(
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
     ],
-    # install_requires=['click==7.0', 'pick>=0.6.4', 'tabulate>=0.8.2'],
+    install_requires=[
+        'adafruit-io~=2.4.0',
+        'click~=7.1.2',
+        'dweepy~=0.3.0',
+        'influxdb~=5.3.0',
+        'pyserial~=3.4',
+        'psutil~=5.7.0',
+        'redis~=2.10.6',
+        'tabulate~=0.8.7',
+    ],
     include_package_data=True,
-    entry_points={
-        'console_scripts': [
-            'jocasta-cron=jocasta.cron_collector:main',
-        ]
-    },
+    entry_points={'console_scripts': ['jocasta=jocasta.collector:main']},
 )

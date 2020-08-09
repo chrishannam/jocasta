@@ -1,4 +1,5 @@
 import json
+from typing import Dict
 
 
 class FileSystemConnector(object):
@@ -9,15 +10,12 @@ class FileSystemConnector(object):
 
         self.file_name = file_name
 
-    def send(self, data):
+    def send(self, data: Dict) -> bool:
+        """
+        Write data as JSON to file.
+        """
 
-        try:
-            f = open(self.file_name, 'w')
+        with open(self.file_name, 'w') as f:
             f.write(json.dumps(data))
-            f.close()
-            response = {'status': 'ok'}
 
-        except Exception as exception:
-            response = {'error': exception.message}
-
-        return response
+        return True
