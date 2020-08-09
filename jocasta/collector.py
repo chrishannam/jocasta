@@ -28,14 +28,12 @@ logger = logging.getLogger(__name__)
 @click.argument('port')
 def main(port):
     sensor_reader = SerialSensor(port=port)
-    config = setup_config()
 
     reading = sensor_reader.read()
     logger.debug(f'Reading: {reading}')
     connectors = {}
 
-    display_table(reading)
-
+    config = setup_config()
     for name, section in config.items():
         args = convert_config_stanza(section)
         if name == 'file_system':
@@ -54,7 +52,10 @@ def main(port):
     #     conn = file_system.FileSystemConnector(setting)
     # elif name == 'INFLUXDB':
     #     conn = influx.InfluxDBConnector(setting)
-    connectors['file_system'].send(data=reading)
+    if connectors:
+        connectors['file_system'].send(data=reading)
+
+    display_table(reading)
 
 
 def display_table(reading: Dict):
