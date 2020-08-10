@@ -1,5 +1,6 @@
+import json
+
 from influxdb import InfluxDBClient
-from datetime import datetime
 import logging
 import platform
 from typing import Dict, List
@@ -29,27 +30,28 @@ class InfluxDBConnector(object):
         Send the data over to the Influx server.
         """
         json_payload = _build_payload(data)
+        logger.info('Sending payload to InfluxDB server')
+        logger.info(json.dumps(json_payload, indent=2))
         self.influx_client.write_points(json_payload)
+        logger.info('Payload sent')
 
 
 def _build_payload(data: Dict) -> List:
     """
     Break out each reading into measurements that Influx will understand.
     """
-    logger.info('Build payload for Influxdb')
+    logger.info('Building payload for Influxdb')
     payload_values = []
 
     # location isn't a measurement we want to log.
     location = data.pop('location', 'unknown location')
 
-    time = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-
     for name, value in data.items():
         payload = {
             'measurement': name,
             'tags': {'host': platform.node(), 'location': location},
-            'time': time,
-            'fields': {'value': value},
+            'fields': {'value': float(value)},
         }
         payload_values.append(payload)
+
     return payload_values

@@ -55,10 +55,10 @@ def main(port):
     #     conn = influx.InfluxDBConnector(setting)
 
     if reading:
-        validate_temperature(
+        display_table(reading)
+        reading = validate_temperature(
             reading, convert_config_stanza(config['temperature_ranges'])
         )
-        display_table(reading)
         for name, connector in connectors.items():
             connector.send(data=reading)
     else:
