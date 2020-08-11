@@ -1,11 +1,12 @@
-from influxdb import InfluxDBClient
 import json
-from datetime import datetime
-import logging
 
+from influxdb import InfluxDBClient
+import logging
+import platform
+from typing import Dict, List
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.ERROR,
     format='%(asctime)s.%(msecs)03d %(levelname)s: %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
 )
@@ -16,37 +17,41 @@ logger = logging.getLogger(__name__)
 class InfluxDBConnector(object):
     def __init__(self, database, password, username, host=None, port=None):
 
-        self.database = database
-
         if not host:
-            self.host = 'localhost'
+            host = 'localhost'
 
         if not port:
-            self.port = 8086
+            port = 8086
 
-        self.influx_client = InfluxDBClient(
-            self.host, self.port, username, password, self.database
-        )
+        self.influx_client = InfluxDBClient(host, port, username, password, database)
 
-    def send(self, data):
+    def send(self, data: Dict) -> None:
+        """
+        Send the data over to the Influx server.
+        """
+        json_payload = _build_payload(data)
+        logger.info('Sending payload to InfluxDB server')
+        logger.info(json.dumps(json_payload, indent=2))
+        self.influx_client.write_points(json_payload)
+        logger.info('Payload sent')
 
-        if not data:
-            f = open('/tmp/zeep_latest_reading.json', 'r')
-            data = f.read()
-            data = json.loads(data)
-            f.close()
 
-        json_payload = []
-        time = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-        try:
-            for name, value in data.iteritems():
-                payload = {
-                    'measurement': name,
-                    'tags': {'host': 'jarvis', 'location': 'office'},
-                    'time': time,
-                    'fields': {'value': value},
-                }
-                json_payload.append(payload)
-            self.influx_client.write_points(json_payload)
-        except Exception as exception:
-            logger.error(f'Failed to write to Influx. Error {exception.message}')
+def _build_payload(data: Dict) -> List:
+    """
+    Break out each reading into measurements that Influx will understand.
+    """
+    logger.info('Building payload for Influxdb')
+    payload_values = []
+
+    # location isn't a measurement we want to log.
+    location = data.pop('location', 'unknown location')
+
+    for name, value in data.items():
+        payload = {
+            'measurement': name,
+            'tags': {'host': platform.node(), 'location': location},
+            'fields': {'value': float(value)},
+        }
+        payload_values.append(payload)
+
+    return payload_values
