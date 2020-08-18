@@ -56,9 +56,10 @@ def main(port):
 
     if reading:
         display_table(reading)
-        reading = validate_temperature(
-            reading, convert_config_stanza(config['temperature_ranges'])
-        )
+        if 'temperature_ranges' in config:
+            reading = validate_temperature(
+                reading, convert_config_stanza(config['temperature_ranges'])
+            )
         for name, connector in connectors.items():
             connector.send(data=reading)
     else:
