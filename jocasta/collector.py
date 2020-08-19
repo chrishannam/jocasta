@@ -7,7 +7,7 @@ from tabulate import tabulate
 
 from jocasta.inputs.serial_connector import SerialSensor
 
-from jocasta.connectors import file_system, influx
+from jocasta.connectors import file_system, influx, io_adafruit
 
 # io_adafruit, influx
 from jocasta.command_line.setup import setup_config, convert_config_stanza
@@ -39,8 +39,8 @@ def main(port):
         args = convert_config_stanza(section)
         if name == 'file_system':
             connectors['file_system'] = file_system.FileSystemConnector(**args)
-        # elif name == 'adafruit':
-        #     connectors['adafruit'] = io_adafruit.IOAdafruitConnector(**args)
+        elif name == 'adafruit':
+            connectors['adafruit'] = io_adafruit.IOAdafruitConnector(**args)
         elif name == 'influxdb':
             connectors['influxdb'] = influx.InfluxDBConnector(**args)
     # elif name == 'file_system':
