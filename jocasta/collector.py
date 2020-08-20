@@ -31,30 +31,21 @@ def main(port):
     sensor_reader = SerialSensor(port=port)
 
     reading = sensor_reader.read()
-    logger.debug(f'Reading: {reading}')
-    connectors = {}
-
-    config = setup_config()
-    for name, section in config.items():
-        args = convert_config_stanza(section)
-        if name == 'file_system':
-            connectors['file_system'] = file_system.FileSystemConnector(**args)
-        elif name == 'adafruit':
-            connectors['adafruit'] = io_adafruit.IOAdafruitConnector(**args)
-        elif name == 'influxdb':
-            connectors['influxdb'] = influx.InfluxDBConnector(**args)
-    # elif name == 'file_system':
-    #     connectors['file_system'] = file_system.FileSystemConnector(**args)
-    # if name == 'DWEET_NAME':
-    #     conn = dweet.DweetConnector(setting)
-    # elif name == 'ADAFRUITIO_KEY':
-    #     conn = io_adafruit.IOAdafruitConnector(setting)
-    # elif name == 'FILE_SYSTEM_PATH':
-    #     conn = file_system.FileSystemConnector(setting)
-    # elif name == 'INFLUXDB':
-    #     conn = influx.InfluxDBConnector(setting)
 
     if reading:
+        logger.debug(f'Reading: {reading}')
+        connectors = {}
+
+        config = setup_config()
+        for name, section in config.items():
+            args = convert_config_stanza(section)
+            if name == 'file_system':
+                connectors['file_system'] = file_system.FileSystemConnector(**args)
+            elif name == 'adafruit':
+                connectors['adafruit'] = io_adafruit.IOAdafruitConnector(**args)
+            elif name == 'influxdb':
+                connectors['influxdb'] = influx.InfluxDBConnector(**args)
+
         display_table(reading)
         if 'temperature_ranges' in config:
             reading = validate_temperature(
