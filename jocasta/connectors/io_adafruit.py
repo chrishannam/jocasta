@@ -1,7 +1,25 @@
+"""
+Module for sending data to https://io.adafruit.com/, checkout
+https://io.adafruit.com/api/docs/ for more information on the adafruit service.
+
+Example ~/.config/jocasta_config.ini:
+
+[adafruit]
+username = username
+key = api_key_from_adafruit_site
+
+# names of the feeds configured on io.adafruit.com
+feeds = office.office-temperature,office.office-light,office.office-humidity
+
+# measurements reported locally.
+measurements = temperature,light,humidity
+
+"""
+
+
 from Adafruit_IO import Client
 import logging
 
-from jocasta.connectors.constants import HUMIDITY, LIGHT, TEMPERATURE
 
 logging.basicConfig(
     level=logging.ERROR,
@@ -13,16 +31,15 @@ logger = logging.getLogger(__name__)
 
 
 class IOAdafruitConnector(object):
-    def __init__(self, key, username, feeds) -> None:
+    def __init__(self, key, username, feeds, measurements) -> None:
         self.aio = Client(username=username, key=key)
         self.feeds = feeds
+        self.measurement_mapping = dict(zip(feeds.split(','), measurements.split(',')))
 
     def send(self, data):
-        for feed in self.feeds.split(','):
-            logger.info(f'Sending {feed} to AdaFruit.')
-            if HUMIDITY in feed:
-                self.aio.send_data(feed, data[HUMIDITY])
-            if LIGHT in feed:
-                self.aio.send_data(feed, data[LIGHT])
-            if TEMPERATURE in feed:
-                self.aio.send_data(feed, data[TEMPERATURE])
+        """
+        Update Adafruit feeds.
+        """
+        for adafruit_feed, measurement_name in self.measurement_mapping.items():
+            logger.info(f'Sending {measurement_name} to AdaFruit.')
+            self.aio.send_data(adafruit_feed, data[measurement_name])
