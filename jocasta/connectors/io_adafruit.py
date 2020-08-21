@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 class IOAdafruitConnector(object):
-    def __init__(self, key, username, feeds, measurements) -> None:
+    def __init__(self, key: str, username: str, feeds: str, measurements: str) -> None:
         self.aio = Client(username=username, key=key)
         self.feeds = feeds
         self.measurement_mapping = dict(zip(feeds.split(','), measurements.split(',')))

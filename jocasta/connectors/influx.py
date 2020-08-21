@@ -25,18 +25,18 @@ class InfluxDBConnector(object):
 
         self.influx_client = InfluxDBClient(host, port, username, password, database)
 
-    def send(self, data: Dict) -> None:
+    def send(self, data: Dict, hostname: str = None) -> None:
         """
         Send the data over to the Influx server.
         """
-        json_payload = _build_payload(data)
+        json_payload = _build_payload(data, hostname=hostname)
         logger.info('Sending payload to InfluxDB server')
         logger.info(json.dumps(json_payload, indent=2))
         self.influx_client.write_points(json_payload)
         logger.info('Payload sent')
 
 
-def _build_payload(data: Dict) -> List:
+def _build_payload(data: Dict, hostname: str = None) -> List:
     """
     Break out each reading into measurements that Influx will understand.
     """
@@ -44,12 +44,15 @@ def _build_payload(data: Dict) -> List:
     payload_values = []
 
     # location isn't a measurement we want to log.
-    location = data.pop('location', 'unknown location')
+    location = data.pop('location', 'unset location')
+
+    if not hostname:
+        hostname = platform.node()
 
     for name, value in data.items():
         payload = {
             'measurement': name,
-            'tags': {'host': platform.node(), 'location': location},
+            'tags': {'host': hostname, 'location': location},
             'fields': {'value': float(value)},
         }
         payload_values.append(payload)
