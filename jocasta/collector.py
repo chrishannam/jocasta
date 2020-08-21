@@ -34,17 +34,9 @@ def main(port):
 
     if reading:
         logger.debug(f'Reading: {reading}')
-        connectors = {}
 
         config = setup_config()
-        for name, section in config.items():
-            args = convert_config_stanza(section)
-            if name == 'file_system':
-                connectors['file_system'] = file_system.FileSystemConnector(**args)
-            elif name == 'adafruit':
-                connectors['adafruit'] = io_adafruit.IOAdafruitConnector(**args)
-            elif name == 'influxdb':
-                connectors['influxdb'] = influx.InfluxDBConnector(**args)
+        connectors: Dict = setup_connectors(config=config)
 
         display_table(reading)
         if 'temperature_ranges' in config:
@@ -55,6 +47,19 @@ def main(port):
             connector.send(data=reading)
     else:
         print('Unable to get reading.')
+
+
+def setup_connectors(config):
+    connectors = {}
+    for name, section in config.items():
+        args = convert_config_stanza(section)
+        if name == 'file_system':
+            connectors['file_system'] = file_system.FileSystemConnector(**args)
+        elif name == 'adafruit':
+            connectors['adafruit'] = io_adafruit.IOAdafruitConnector(**args)
+        elif name == 'influxdb':
+            connectors['influxdb'] = influx.InfluxDBConnector(**args)
+    return connectors
 
 
 def display_table(reading: Dict):
