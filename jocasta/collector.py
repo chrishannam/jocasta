@@ -27,15 +27,17 @@ logger = logging.getLogger(__name__)
 
 @click.command()
 @click.argument('port')
-def main(port):
+@click.argument('ini_file', required=False, type=click.Path(exists=True))
+def main(port, ini_file=None):
+
     sensor_reader = SerialSensor(port=port)
 
     reading = sensor_reader.read()
 
     if reading:
         logger.debug(f'Reading: {reading}')
+        config = setup_config(ini_file=ini_file)
 
-        config = setup_config()
         connectors: Dict = setup_connectors(config=config)
 
         display_table(reading)
