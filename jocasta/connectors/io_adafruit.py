@@ -4,7 +4,7 @@ https://io.adafruit.com/api/docs/ for more information on the adafruit service.
 
 Example ~/.config/jocasta_config.ini:
 
-[adafruit]
+[io_adafruit]
 username = username
 key = api_key_from_adafruit_site
 
