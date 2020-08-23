@@ -2,7 +2,11 @@
 Library to extract data from serial and send it various services.
 
 # Quick Start
+## Installation
+`pip3 install jocasta`
+
 ## Basic Home Config File
+
 Create a directory in your home directory to store the config file. You can pass in a file
 at run time but this is the quick start.
 
@@ -61,6 +65,12 @@ $ jocasta /dev/ttyUSB0
 ╘═════════════╧══════════╧══════════╧══════════╧════════╛
 ```
 
+# Running
+A config file can supplied to the command line call using the following:
+```
+jocasta /dev/tty.usbserial-14230 /path/to/config.ini
+```
+
 # Supported Services
 Services and things Jocasta can send data to.
 
@@ -78,6 +88,9 @@ database = greenhouses
 ```
 
 ## Adafruit IO - https://io.adafruit.com
+Adafruit's beta IoT hosted application.
+
+### Config
 ```
 [io_adafruit]
 username = username
@@ -87,7 +100,17 @@ measurements = temperature,light,humidity
 ```
 
 ## File System
+Outputs` json` to a file on disk. This is handy for other applications to access the data.
+
+### Config
+
 ```
 [file_system]
 file_name = /tmp/sensor_data.json
 ```
+
+## MQTT
+TODO
+
+## Kafka
+TODO
