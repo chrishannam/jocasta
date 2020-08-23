@@ -1,30 +1,45 @@
-from Adafruit_IO import Client
+"""
+Module for sending data to https://io.adafruit.com/, checkout
+https://io.adafruit.com/api/docs/ for more information on the adafruit service.
 
-try:
-    from settings import SERVICES
-except ImportError:
-    # service not configured
-    pass
+Example ~/.config/jocasta_config.ini:
+
+[io_adafruit]
+username = username
+key = api_key_from_adafruit_site
+
+# names of the feeds configured on io.adafruit.com
+feeds = office.office-temperature,office.office-light,office.office-humidity
+
+# measurements reported locally.
+measurements = temperature,light,humidity
+
+"""
+
+
+from Adafruit_IO import Client
+import logging
+
+
+logging.basicConfig(
+    level=logging.ERROR,
+    format='%(asctime)s.%(msecs)03d %(levelname)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
+
+logger = logging.getLogger(__name__)
 
 
 class IOAdafruitConnector(object):
-
-    def __init__(self, api_key=None):
-
-        if not api_key:
-            api_key =  SERVICES['ADAFRUITIO_KEY']
-
-        self.aio = Client(api_key)
+    def __init__(self, key: str, username: str, feeds: str, measurements: str) -> None:
+        self.aio = Client(username=username, key=key)
+        self.feeds = feeds
+        self.measurement_mapping = dict(zip(feeds.split(','), measurements.split(',')))
 
     def send(self, data):
-        # send data to dweet
-
-        try:
-            for key, value in data.iteritems():
-                self.aio.send(key, value)
-
-            response = {'status': 'ok'}
-        except Exception as exception:
-            response = {'error': exception.message}
-
-        return response
+        """
+        Update Adafruit feeds.
+        """
+        for adafruit_feed, measurement_name in self.measurement_mapping.items():
+            logger.info(f'Sending {measurement_name} to AdaFruit.')
+            self.aio.send_data(adafruit_feed, data[measurement_name])

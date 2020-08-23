@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 class SerialSensor:
     def __init__(self, port=None, json_data=True, debug=True):
         if port:
-            self.serial_port = SERIAL_PORT_PATH_ROOT + port
+            self.serial_port = port
         else:
             logger.info('Finding port.')
             self.serial_port = _detect_port()

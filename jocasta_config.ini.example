@@ -1,17 +1,23 @@
-[adafruit]
-USERNAME = Your name
-KEY = asdfgsdfgadfgsdfg
+[io_adafruit]
+username = Your name
+key = asdfgsdfgadfgsdfg
+feeds = office.office-temperature,office.office-light,office.office-humidity
+measurements = temperature,light,humidity
 
 [influxdb]
-HOST = 192.160.0.100
-PORT = 8086
-PASSWORD = secret
-USERNAME = username
-DATABASE = db_name
+host = 192.160.0.100
+port = 8086
+password = secret
+username = username
+database = db_name
 
-[filesystem]
-FILENAME = /tmp/sensor_data.json
+[file_system]
+file_name = /tmp/sensor_data.json
 
 [temperature_ranges]
 maximum = 100.0
 minimum = -10.0
+
+[openweather]
+key = key
+location = Oxford,GB
