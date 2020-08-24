@@ -5,7 +5,7 @@ test:
 
 clean:
 	@echo "Cleaning up..."
-	rm -rf dist build
+	rm -rf dist build sdist bdist_wheel
 
 install:
 	python setup.py install
