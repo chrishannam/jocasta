@@ -16,18 +16,35 @@ import logging
 
 from jocasta.validators import validate_temperature
 
-logging.basicConfig(
-    level=logging.ERROR,
-    format='%(asctime)s.%(msecs)03d %(levelname)s: %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-)
-
-logger = logging.getLogger(__name__)
+LEVELS = {
+    'critical': logging.CRITICAL,
+    'error': logging.ERROR,
+    'warn': logging.WARNING,
+    'warning': logging.WARNING,
+    'info': logging.INFO,
+    'debug': logging.DEBUG,
+}
 
 
 @click.command()
 @click.argument('port')
-def main(port):
+@click.argument('log-level', required=False)
+def main(port, log_level):
+
+    level = LEVELS.get(log_level)
+    logging.basicConfig(
+        level=level,
+        format='%(asctime)s.%(msecs)03d %(levelname)s: %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+    )
+
+    logger = logging.getLogger(__name__)
+    loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
+    for logger in loggers:
+        logger.setLevel(level)
+
+    logger.debug('Starting...')
+
     sensor_reader = SerialSensor(port=port)
 
     reading = sensor_reader.read()
@@ -71,5 +88,4 @@ def display_table(reading: Dict):
 
 
 if __name__ == '__main__':
-    logger.debug('Starting...')
     main()
