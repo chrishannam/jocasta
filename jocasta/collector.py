@@ -28,7 +28,7 @@ LEVELS = {
 
 @click.command()
 @click.option('--port', '-p', type=click.Path(exists=True))
-@click.option('--config-file', 'c', required=False, type=click.Path(exists=True))
+@click.option('--config-file', '-c', required=False, type=click.Path(exists=True))
 @click.option('--log-level', '-l', default='error')
 def main(port, config_file, log_level):
 
