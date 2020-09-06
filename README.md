@@ -1,40 +1,116 @@
 # Jocasta
 Library to extract data from serial and send it various services.
 
+# Quick Start
+## Installation
+`pip3 install jocasta`
+
+## Basic Home Config File
+
+Create a directory in your home directory to store the config file. You can pass in a file
+at run time but this is the quick start.
+
+```
+cd ~
+mkdir .config
+cd .config
+```
+
+Create a file called `jocasta_config.ini` and copy and paste the following into the depending on which services you want.
+
+```
+[io_adafruit]
+username = username
+key = key
+feeds = temperature,light,humidity
+measurements = temperature,light,humidity
+
+[influxdb]
+host = 192.168.1.100
+port = 8086
+password = admin
+username = admin
+database = greenhouses
+
+[file_system]
+file_name = /tmp/sensor_data.json
+
+[temperature_ranges]
+maximum = 55.0
+minimum = -10.0
+```
+
+## Running
+Start `jocasta` by add the path of your serial device.
+
+### OSX
+Command and output
+```
+$ jocasta /dev/tty.usbserial-14230
+╒═════════════╤══════════╤══════════╤══════════╤════════╕
+│ Temperature │ Location │ Moisture │ Humidity │ Light  │
+├─────────────┼──────────┼──────────┼──────────┼────────┤
+│ 23.2        │ office   │ 568      │ 61.2     │ 5800.0 │
+╘═════════════╧══════════╧══════════╧══════════╧════════╛
+```
+
+###  Raspberry Pi / Linux
+Command and output
+```
+$ jocasta /dev/ttyUSB0
+╒═════════════╤══════════╤══════════╤══════════╤════════╕
+│ Temperature │ Location │ Moisture │ Humidity │ Light  │
+├─────────────┼──────────┼──────────┼──────────┼────────┤
+│ 23.2        │ office   │ 568      │ 61.2     │ 5800.0 │
+╘═════════════╧══════════╧══════════╧══════════╧════════╛
+```
+
+# Running
+A config file can supplied to the command line call using the following:
+```
+jocasta /dev/tty.usbserial-14230 /path/to/config.ini
+```
+
 # Supported Services
 Services and things Jocasta can send data to.
 
-## Dweet https://dweet.io
-Ridiculously simple messaging (and alerts) for the Internet of Things.
-
-## IO https://io.adafruit.com/
-Open beta of a simple to use graphing platform.
-
-## Text File
-A simple file in ```/tmp``` with a string of JSON.
-
-
-# Setup
-The below will get you going.
+## InfluxDB - https://www.influxdata.com
+### Config
+Add the following to your `jocasta-config.ini` file, making sure you update the values
+to match your InfluxDB server.
 ```
-git clone git@github.com:chrishannam/jocasta.git
-cd jocasta
-[sudo] pip install virtualenv
-virtualenv .
-source bin/activate
-pip install -r requirements.txt
-python src/jocasta/collector.py
+[influxdb]
+host = 192.168.1.100
+port = 8086
+password = admin
+username = admin
+database = greenhouses
 ```
 
-Assuming that works you will need to configure services.
+## Adafruit IO - https://io.adafruit.com
+Adafruit's beta IoT hosted application.
 
-# Configuring Third Party Services
+### Config
+```
+[io_adafruit]
+username = username
+key = key
+feeds = temperature,light,humidity
+measurements = temperature,light,humidity
+```
+
+## File System
+Outputs` json` to a file on disk. This is handy for other applications to access the data.
+
+### Config
 
 ```
-cp src/jocasta/settings/__init__.py.example src/jocasta/settings/__init__.py
-
-
-# populate the fields with the third party settings and uncomment the services you want
-$EDITOR src/jocasta/settings/__init__.py
-
+[file_system]
+file_name = /tmp/sensor_data.json
 ```
+
+## MQTT
+TODO
+
+## Kafka
+TODO
