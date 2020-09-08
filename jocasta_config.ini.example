@@ -21,3 +21,6 @@ minimum = -10.0
 [openweather]
 key = key
 location = Oxford,GB
+
+[local_database]
+path = /path/to/database/file  # usually your home directory
