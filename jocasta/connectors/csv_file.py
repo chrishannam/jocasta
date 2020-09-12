@@ -1,5 +1,5 @@
 import csv
-
+import pathlib
 import logging
 
 
@@ -13,13 +13,25 @@ logger = logging.getLogger(__name__)
 
 
 class CSVFileConnector(object):
-    def __init__(self, file_path):
+    def __init__(self, path):
 
-        self.file_path = file_path
+        self.file_path = path
 
-    def send(self, data):
-        with open(self.file_path, 'w') as csvfile:
+    def send(self, data) -> bool:
+        write_header = False
+
+        # check for file
+        path = pathlib.Path(self.file_path)
+
+        if not path.exists():
+            write_header = True
+
+        with open(self.file_path, 'a') as csv_file:
             fieldnames = data.keys()
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            writer.writeheader()
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+
+            # if we have a new file, write the header
+            if write_header:
+                writer.writeheader()
             writer.writerow(data)
+        return True

@@ -21,3 +21,6 @@ minimum = -10.0
 [openweather]
 key = key
 location = Oxford,GB
+
+[csv_file]
+path = /tmp/sensor_data.csv

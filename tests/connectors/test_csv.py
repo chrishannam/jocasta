@@ -18,13 +18,11 @@ def test_connector(reading):
         csv_output_file = tmp_dir_name_path / FILENAME
         connector = CSVFileConnector(csv_output_file)
         connector.send(reading)
-        assert _test_csv_file(tmp_dir_name_path, reading)
+        assert _test_csv_file(csv_output_file, reading)
 
 
 def _test_csv_file(filename, reading):
-    csv_data = []
-    with open(filename, newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            csv_data.append(row)
-    assert csv_data == reading
+    with open(filename, newline='') as csv_file:
+        reader = csv.DictReader(csv_file)
+        csv_data = list(reader)
+        return csv_data[0].keys() == reading.keys()
