@@ -7,7 +7,7 @@ from tabulate import tabulate
 
 from jocasta.inputs.serial_connector import SerialSensor
 
-from jocasta.connectors import file_system, influx, io_adafruit
+from jocasta.connectors import file_system, influx, io_adafruit, csv_file
 
 # io_adafruit, influx
 from jocasta.command_line.setup import setup_config, convert_config_stanza
@@ -76,6 +76,8 @@ def setup_connectors(config):
             connectors[name] = io_adafruit.IOAdafruitConnector(**args)
         elif name == 'influxdb':
             connectors[name] = influx.InfluxDBConnector(**args)
+        elif name == 'csv_file':
+            connectors[name] = csv_file.CSVFileConnector(**args)
     return connectors
 
 
