@@ -1,3 +1,6 @@
+[csv_file]
+path = /tmp/sensor_data.csv
+
 [io_adafruit]
 username = Your name
 key = asdfgsdfgadfgsdfg
@@ -17,10 +20,3 @@ file_name = /tmp/sensor_data.json
 [temperature_ranges]
 maximum = 100.0
 minimum = -10.0
-
-[openweather]
-key = key
-location = Oxford,GB
-
-[csv_file]
-path = /tmp/sensor_data.csv

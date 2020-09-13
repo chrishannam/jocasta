@@ -70,14 +70,14 @@ def setup_connectors(config):
     connectors = {}
     for name, section in config.items():
         args = convert_config_stanza(section)
-        if name == 'file_system':
+        if name == 'csv_file':
+            connectors[name] = csv_file.CSVFileConnector(**args)
+        elif name == 'file_system':
             connectors[name] = file_system.FileSystemConnector(**args)
         elif name == 'io_adafruit':
             connectors[name] = io_adafruit.IOAdafruitConnector(**args)
         elif name == 'influxdb':
             connectors[name] = influx.InfluxDBConnector(**args)
-        elif name == 'csv_file':
-            connectors[name] = csv_file.CSVFileConnector(**args)
     return connectors
 
 
