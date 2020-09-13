@@ -5,7 +5,7 @@ test:
 
 clean:
 	@echo "Cleaning up..."
-	rm -rf dist build sdist bdist_wheel
+	rm -rf dist build sdist bdist_wheel jocasta.egg-info
 
 install:
 	python setup.py install
