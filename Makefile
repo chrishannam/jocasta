@@ -1,4 +1,4 @@
-deploy: test clean build
+deploy: test clean build push
 
 test:
 	PYTHONPATH=. pytest --cov jocasta --cov-report term-missing -s -p no:warnings --log-cli-level error
