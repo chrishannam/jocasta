@@ -98,3 +98,4 @@ ENV/
 jocasta_config.ini
 
 .idea
+!/build/

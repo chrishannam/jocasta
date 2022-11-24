@@ -1,6 +1,8 @@
 import json
 
-from influxdb import InfluxDBClient
+from influxdb_client import InfluxDBClient
+from influxdb_client import Point
+from influxdb_client.client.write_api import SYNCHRONOUS
 import logging
 import platform
 from typing import Dict, List
@@ -14,47 +16,46 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class InfluxDBConnector(object):
-    def __init__(self, database, password, username, host=None, port=None):
+class InfluxDBConnector:
+    def __init__(self, url: str, token: str, org: str, bucket: str):
 
-        if not host:
-            host = 'localhost'
-
-        if not port:
-            port = 8086
-
-        self.influx_client = InfluxDBClient(host, port, username, password, database)
+        self.client = InfluxDBClient(url=url, token=token, org=org)
+        self.org = org
+        self.bucket = bucket
+        self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
 
     def send(self, data: Dict, hostname: str = None) -> None:
         """
         Send the data over to the Influx server.
         """
-        json_payload = _build_payload(data, hostname=hostname)
         logger.info('Sending payload to InfluxDB server')
-        logger.info(json.dumps(json_payload, indent=2))
-        self.influx_client.write_points(json_payload)
+        self.send_payload(data, hostname=hostname)
         logger.info('Payload sent')
 
+    def send_payload(self, data: Dict, hostname: str = None) -> bool:
+        """
+        Break out each reading into measurements that Influx will understand.
+        """
+        logger.info('Building payload for Influxdb')
+        payload_values = []
 
-def _build_payload(data: Dict, hostname: str = None) -> List:
-    """
-    Break out each reading into measurements that Influx will understand.
-    """
-    logger.info('Building payload for Influxdb')
-    payload_values = []
+        # location isn't a measurement we want to log.
+        location = data.pop('location', 'unset location')
 
-    # location isn't a measurement we want to log.
-    location = data.pop('location', 'unset location')
+        if not hostname:
+            hostname = platform.node()
 
-    if not hostname:
-        hostname = platform.node()
+        for name, value in data.items():
+            # payload = {
+            #     'measurement': name,
+            #     'tags': {'host': hostname, 'location': location},
+            #     'fields': {'value': float(value)},
+            # }
+            point = (
+                Point(name)
+                .tag("host", hostname)
+                .field("value", value)
+            )
+            self.write_api.write(bucket=self.bucket, org=self.org, record=point)
 
-    for name, value in data.items():
-        payload = {
-            'measurement': name,
-            'tags': {'host': hostname, 'location': location},
-            'fields': {'value': float(value)},
-        }
-        payload_values.append(payload)
-
-    return payload_values
+        return True
