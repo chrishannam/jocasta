@@ -63,7 +63,7 @@ class InfluxDBConnector:
             # }
             point = (
                 Point('office')
-                .tag("host", name)
+                .tag("reading", name)
                 .tag("host", hostname)
                 .tag('location', location)
                 .field("value", value)
