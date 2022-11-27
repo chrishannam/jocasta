@@ -24,11 +24,13 @@ setuptools.setup(
         'adafruit-io~=2.7.0',
         'click~=8.1.3',
         'dweepy~=0.3.0',
-        'influxdb~=5.3.1',
+        'influxdb-client~=1.34.0',
         'pyserial~=3.5',
         'psutil~=5.9.4',
         'tabulate~=0.9.0',
+        'pycryptodome',
+        'tapo-plug'
     ],
     include_package_data=True,
-    entry_points={'console_scripts': ['jocasta=jocasta.collector:main']},
+    entry_points={'console_scripts': ['jocasta=jocasta.collector:main', 'tapo=jocasta.tapo:main']},
 )

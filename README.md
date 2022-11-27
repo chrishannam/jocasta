@@ -48,6 +48,12 @@ measurements = temperature,light,humidity
 [temperature_ranges]
 maximum = 55.0
 minimum = -10.0
+
+[tapo_plugs]
+username=tapo@login.com
+password=password_for_tapo-online
+ipaddresses=192.168.0.51,192.168.0.52,192.168.0.53
+
 ```
 
 The last section `temperature_ranges` is a range you add to ensure if your reading called

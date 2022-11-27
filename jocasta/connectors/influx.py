@@ -32,12 +32,22 @@ class InfluxDBConnector:
         self.send_payload(data, hostname=hostname)
         logger.info('Payload sent')
 
+    def send_tapo(self, section, data, device_name=None):
+
+        for name, value in data.items():
+            point = (
+                Point(device_name)
+                .tag("host", device_name)
+                .tag('reading', section)
+                .field("value", float(value))
+            )
+            self.write_api.write(bucket=self.bucket, org=self.org, record=point)
+
     def send_payload(self, data: Dict, hostname: str = None) -> bool:
         """
         Break out each reading into measurements that Influx will understand.
         """
         logger.info('Building payload for Influxdb')
-        payload_values = []
 
         # location isn't a measurement we want to log.
         location = data.pop('location', 'unset location')
@@ -52,8 +62,10 @@ class InfluxDBConnector:
             #     'fields': {'value': float(value)},
             # }
             point = (
-                Point(name)
+                Point('office')
+                .tag("host", name)
                 .tag("host", hostname)
+                .tag('location', location)
                 .field("value", value)
             )
             self.write_api.write(bucket=self.bucket, org=self.org, record=point)
