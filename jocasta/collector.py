@@ -5,12 +5,9 @@ from typing import Dict
 
 from tabulate import tabulate
 
+from jocasta.config import load_config
 from jocasta.inputs.serial_connector import SerialSensor
 
-from jocasta.connectors import file_system, influx, io_adafruit, csv_file
-
-# io_adafruit, influx
-from jocasta.command_line.setup import setup_config, convert_config_stanza
 import click
 import logging
 
@@ -27,11 +24,12 @@ LEVELS = {
 
 
 @click.command()
-@click.option('--port', '-p', type=click.Path(exists=True))
+@click.option('--port', '-p') # , type=click.Path(exists=True))
 @click.option('--config-file', '-c', required=False, type=click.Path(exists=True))
 @click.option('--log-level', '-l', default='error')
 def main(port, config_file, log_level):
 
+    connectors = load_config(config_file)
     level = LEVELS.get(log_level)
     logging.basicConfig(
         level=level,
@@ -45,40 +43,37 @@ def main(port, config_file, log_level):
         logger.setLevel(level)
 
     logger.debug('Starting...')
-    sensor_reader = SerialSensor(port=port)
 
+    sensor_reader = SerialSensor(port=port)
     reading = sensor_reader.read()
 
     if reading:
-        logger.debug(f'Reading: {reading}')
-        config = setup_config(ini_file=config_file)
+        for conf in connectors.enabled_configs():
+            logger.debug(f'Reading: {reading}')
 
-        connectors: Dict = setup_connectors(config=config)
-
-        display_table(reading)
-        if 'temperature_ranges' in config:
-            reading = validate_temperature(
-                reading, convert_config_stanza(config['temperature_ranges'])
-            )
-        for name, connector in connectors.items():
-            connector.send(data=reading)
+            display_table(reading)
+            if hasattr(connectors, 'temperature_ranges'):
+                reading = validate_temperature(reading=reading, valid_range=connectors.temperature_ranges)
+            conn.send(data=reading)
     else:
         print('Unable to get reading.')
 
 
-def setup_connectors(config):
-    connectors = {}
-    for name, section in config.items():
-        args = convert_config_stanza(section)
-        if name == 'csv_file':
-            connectors[name] = csv_file.CSVFileConnector(**args)
-        elif name == 'file_system':
-            connectors[name] = file_system.FileSystemConnector(**args)
-        elif name == 'io_adafruit':
-            connectors[name] = io_adafruit.IOAdafruitConnector(**args)
-        elif name == 'influxdb':
-            connectors[name] = influx.InfluxDBConnector(**args)
-    return connectors
+# def setup_cs(config):
+#     connectors = {}
+#     for name, section in config.items():
+#         args = convert_config_stanza(section)
+#         if name == 'csv_file':
+#             connectors[name] = csv_file.CSVFileConnector(**args)
+#         elif name == 'file_system':
+#             connectors[name] = file_system.FileSystemConnector(**args)
+#         elif name == 'io_adafruit':
+#             connectors[name] = io_adafruit.IOAdafruitConnector(**args)
+#         elif name == 'influxdb':
+#             connectors[name] = influx.InfluxDBConnector(**args)
+#         elif name == 'kafka':
+#             connectors[name] = influx.InfluxDBConnector(**args)
+#     return connectors
 
 
 def display_table(reading: Dict):

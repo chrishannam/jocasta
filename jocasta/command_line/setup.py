@@ -13,6 +13,3 @@ def setup_config(ini_file: t.Union[str, None] = None) -> ConfigParser:
     config.read(ini_file)
     return config
 
-
-def convert_config_stanza(config: SectionProxy) -> t.Dict:
-    return {k: v for k, v in config.items()}
