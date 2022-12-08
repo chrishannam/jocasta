@@ -3,8 +3,7 @@ import logging
 from typing import Dict
 
 from jocasta.config import KafkaConfiguration
-from kafka import KafkaProducer
-from kafka.errors import NoBrokersAvailable
+from confluent_kafka import Producer
 
 
 logging.basicConfig(
@@ -20,20 +19,14 @@ class KafkaConnector:
     Send the packets as JSON to Kafka.
     """
 
-    in_error: bool = False
-
     def __init__(self, configuration: KafkaConfiguration):
-        try:
-            self.producer = KafkaProducer(
-                bootstrap_servers=configuration.bootstrap_servers
-            )
-        except NoBrokersAvailable:
-            logger.error("No Kafka brokers available, skipping sending to Kafka.")
-            self.in_error = True
+        self.producer = Producer({'bootstrap.servers': configuration.bootstrap_servers})
+        self.topics = {}
+        for i in configuration.topics.split(','):
+            self.topics[i.split(':')[0]] = i.split(':')[1]
 
-    def send(self, topic, message):
-        self.producer.send(topic, json.dumps(message).encode())
-
-    def build_data(self, name: str, value, data: Dict) -> Dict:
-        data[name] = value
-        return data
+    def send(self, data):
+        for reading, value in data.items():
+            d = {reading: value}
+            self.producer.produce(self.topics[reading], json.dumps(d).encode())
+        self.producer.flush()

@@ -41,6 +41,7 @@ CONFIG_FILE_NAME: str = 'jocasta.ini'
 @dataclass
 class KafkaConfiguration:
     bootstrap_servers: str
+    topics: str
 
 
 @dataclass
@@ -54,6 +55,11 @@ class InfluxDBConfiguration:
 @dataclass
 class FileSystemConfiguration:
     filename: str
+
+
+@dataclass
+class LocalConfiguration:
+    location: str
 
 
 @dataclass
@@ -78,6 +84,14 @@ class ConnectorsConfiguration:
         return connectors_enabled
 
 
+# class Connectors:
+#     def __init__(self, config: ConnectorsConfiguration):
+#         self.config = config
+#         self.kafka = None
+#         self.influxdb = None
+#         self.file_system = None
+
+
 def load_config(filename=None,) -> ConnectorsConfiguration:
     if not filename:
         filename: Path = HOME / '.config' / CONFIG_FILE_NAME
@@ -95,7 +109,8 @@ def load_config(filename=None,) -> ConnectorsConfiguration:
     for section in config.keys():
         if section == 'kafka':
             connector_config.kafka = KafkaConfiguration(
-                bootstrap_servers=config[section]['bootstrap_servers']
+                bootstrap_servers=config[section]['bootstrap_servers'],
+                topics=config[section]['topics']
             )
 
         elif section == 'influxdb':
@@ -115,6 +130,11 @@ def load_config(filename=None,) -> ConnectorsConfiguration:
             connector_config.temperature_ranges = TemperatureRanges(
                 maximum=float(config[section]['maximum']),
                 minimum=float(config[section]['minimum']),
+            )
+
+        elif section == 'local':
+            connector_config.local = LocalConfiguration(
+                location=config[section]['location'],
             )
 
     return connector_config

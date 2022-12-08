@@ -7,6 +7,8 @@ import logging
 import platform
 from typing import Dict, List
 
+from jocasta.config import InfluxDBConfiguration
+
 logging.basicConfig(
     level=logging.ERROR,
     format='%(asctime)s.%(msecs)03d %(levelname)s: %(message)s',
@@ -17,11 +19,14 @@ logger = logging.getLogger(__name__)
 
 
 class InfluxDBConnector:
-    def __init__(self, url: str, token: str, org: str, bucket: str):
+    def __init__(self, configuration: InfluxDBConfiguration):
 
-        self.client = InfluxDBClient(url=url, token=token, org=org)
-        self.org = org
-        self.bucket = bucket
+        self.client = InfluxDBClient(url=configuration.url,
+                                     token=configuration.token,
+                                     org=configuration.org
+                                     )
+        self.org = configuration.org
+        self.bucket = configuration.bucket
         self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
 
     def send(self, data: Dict, hostname: str = None) -> None:
@@ -48,24 +53,14 @@ class InfluxDBConnector:
         Break out each reading into measurements that Influx will understand.
         """
         logger.info('Building payload for Influxdb')
-
-        # location isn't a measurement we want to log.
-        location = data.pop('location', 'unset location')
-
         if not hostname:
             hostname = platform.node()
 
         for name, value in data.items():
-            # payload = {
-            #     'measurement': name,
-            #     'tags': {'host': hostname, 'location': location},
-            #     'fields': {'value': float(value)},
-            # }
             point = (
                 Point('office')
                 .tag("reading", name)
                 .tag("host", hostname)
-                .tag('location', location)
                 .field("value", value)
             )
             self.write_api.write(bucket=self.bucket, org=self.org, record=point)

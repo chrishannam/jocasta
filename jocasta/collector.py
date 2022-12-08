@@ -6,6 +6,7 @@ from typing import Dict
 from tabulate import tabulate
 
 from jocasta.config import load_config
+from jocasta.connectors.enabled_connectors import EnabledConnectors
 from jocasta.inputs.serial_connector import SerialSensor
 
 import click
@@ -29,7 +30,7 @@ LEVELS = {
 @click.option('--log-level', '-l', default='error')
 def main(port, config_file, log_level):
 
-    connectors = load_config(config_file)
+    configs = load_config(config_file)
     level = LEVELS.get(log_level)
     logging.basicConfig(
         level=level,
@@ -44,14 +45,16 @@ def main(port, config_file, log_level):
 
     logger.debug('Starting...')
 
-    sensor_reader = SerialSensor(port=port)
-    reading = sensor_reader.read()
+    # sensor_reader = SerialSensor(port=port)
+    # reading = sensor_reader.read()
+    reading = {'light': 5.0, 'temperature': 16.0, 'humidity': 76.0}
+    display_table(reading)
 
     if reading:
-        for conf in connectors.enabled_configs():
+        connectors = EnabledConnectors(configs)
+        for conn in connectors.connectors:
             logger.debug(f'Reading: {reading}')
 
-            display_table(reading)
             if hasattr(connectors, 'temperature_ranges'):
                 reading = validate_temperature(reading=reading, valid_range=connectors.temperature_ranges)
             conn.send(data=reading)

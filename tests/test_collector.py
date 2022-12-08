@@ -4,7 +4,7 @@ from jocasta.command_line.setup import setup_config
 from pathlib import Path
 
 from jocasta.connectors.file_system import FileSystemConnector
-from jocasta.connectors.influx import InfluxDBConnector
+from jocasta.connectors.influxdb import InfluxDBConnector
 from jocasta.connectors.io_adafruit import IOAdafruitConnector
 
 INI_FILE = Path(__file__).parent / '..' / 'jocasta_config.ini.example'

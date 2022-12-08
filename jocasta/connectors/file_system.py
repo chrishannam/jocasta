@@ -1,14 +1,12 @@
 import json
 from typing import Dict
 
+from jocasta.config import FileSystemConfiguration
 
-class FileSystemConnector(object):
-    def __init__(self, file_name=None):
 
-        if not file_name:
-            file_name = '/tmp/jocasta.json'
-
-        self.file_name = file_name
+class FileSystemConnector:
+    def __init__(self, configuration: FileSystemConfiguration):
+        self.file_name = configuration.filename
 
     def send(self, data: Dict) -> bool:
         """
