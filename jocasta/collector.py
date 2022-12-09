@@ -1,6 +1,7 @@
 """
 Generic collector code to run config file
 """
+import platform
 from typing import Dict
 
 from tabulate import tabulate
@@ -45,10 +46,12 @@ def main(port, config_file, log_level):
 
     logger.debug('Starting...')
 
-    # sensor_reader = SerialSensor(port=port)
-    # reading = sensor_reader.read()
-    reading = {'light': 5.0, 'temperature': 16.0, 'humidity': 76.0}
+    sensor_reader = SerialSensor(port=port)
+    reading = sensor_reader.read()
     display_table(reading)
+
+    location = configs.local.location
+    hostname = platform.node()
 
     if reading:
         connectors = EnabledConnectors(configs)
@@ -57,7 +60,7 @@ def main(port, config_file, log_level):
 
             if hasattr(connectors, 'temperature_ranges'):
                 reading = validate_temperature(reading=reading, valid_range=connectors.temperature_ranges)
-            conn.send(data=reading)
+            conn.send(data=reading, location=location, hostname=hostname)
     else:
         print('Unable to get reading.')
 

@@ -21,12 +21,14 @@ class KafkaConnector:
 
     def __init__(self, configuration: KafkaConfiguration):
         self.producer = Producer({'bootstrap.servers': configuration.bootstrap_servers})
-        self.topics = {}
-        for i in configuration.topics.split(','):
-            self.topics[i.split(':')[0]] = i.split(':')[1]
 
-    def send(self, data):
+    def send(self, data: Dict, hostname: str, location: str):
         for reading, value in data.items():
-            d = {reading: value}
-            self.producer.produce(self.topics[reading], json.dumps(d).encode())
+            d = {
+                reading: value,
+                "location": location,
+                "hostname": hostname,
+            }
+            topic = f'{location}.{reading}'
+            self.producer.produce(topic, json.dumps(d).encode())
         self.producer.flush()

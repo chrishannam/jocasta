@@ -8,7 +8,7 @@ class FileSystemConnector:
     def __init__(self, configuration: FileSystemConfiguration):
         self.file_name = configuration.filename
 
-    def send(self, data: Dict) -> bool:
+    def send(self, data: Dict, hostname: str, location: str) -> bool:
         """
         Write data as JSON to file.
         """
