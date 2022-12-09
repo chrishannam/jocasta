@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 from deepdiff import DeepDiff
-from jocasta.connectors.influx import _build_payload, InfluxDBConnector
+from jocasta.connectors.influxdb import _build_payload, InfluxDBConnector
 
 
 def test_build_payload(reading, payload, hostname):

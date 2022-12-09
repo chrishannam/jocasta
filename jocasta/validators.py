@@ -1,6 +1,8 @@
 from typing import Dict
 import logging
 
+from jocasta.config import TemperatureRanges
+
 logging.basicConfig(
     level=logging.ERROR,
     format='%(asctime)s.%(msecs)03d %(levelname)s: %(message)s',
@@ -10,7 +12,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def validate_temperature(reading: Dict, valid_range: Dict) -> Dict:
+def validate_temperature(reading: Dict, valid_range: TemperatureRanges) -> Dict:
     """
     Remove any fields that fall outside like values.
     The ds18b20 returns -127.0 when not connected.
@@ -33,8 +35,8 @@ def validate_temperature(reading: Dict, valid_range: Dict) -> Dict:
 
         try:
             value = float(value)
-            max_value = float(valid_range['maximum'])
-            min_value = float(valid_range['minimum'])
+            max_value = float(valid_range.maximum)
+            min_value = float(valid_range.minimum)
 
             if 'temperature' in name:
                 if value == -127.0:

@@ -7,6 +7,8 @@ import logging
 import platform
 from typing import Dict, List
 
+from jocasta.config import InfluxDBConfiguration
+
 logging.basicConfig(
     level=logging.ERROR,
     format='%(asctime)s.%(msecs)03d %(levelname)s: %(message)s',
@@ -17,19 +19,22 @@ logger = logging.getLogger(__name__)
 
 
 class InfluxDBConnector:
-    def __init__(self, url: str, token: str, org: str, bucket: str):
+    def __init__(self, configuration: InfluxDBConfiguration):
 
-        self.client = InfluxDBClient(url=url, token=token, org=org)
-        self.org = org
-        self.bucket = bucket
+        self.client = InfluxDBClient(url=configuration.url,
+                                     token=configuration.token,
+                                     org=configuration.org
+                                     )
+        self.org = configuration.org
+        self.bucket = configuration.bucket
         self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
 
-    def send(self, data: Dict, hostname: str = None) -> None:
+    def send(self, data: Dict, hostname: str, location: str) -> None:
         """
         Send the data over to the Influx server.
         """
         logger.info('Sending payload to InfluxDB server')
-        self.send_payload(data, hostname=hostname)
+        self.send_payload(data, hostname=hostname, location=location)
         logger.info('Payload sent')
 
     def send_tapo(self, section, data, device_name=None):
@@ -43,29 +48,18 @@ class InfluxDBConnector:
             )
             self.write_api.write(bucket=self.bucket, org=self.org, record=point)
 
-    def send_payload(self, data: Dict, hostname: str = None) -> bool:
+    def send_payload(self, data: Dict, hostname: str, location: str = None) -> bool:
         """
         Break out each reading into measurements that Influx will understand.
         """
         logger.info('Building payload for Influxdb')
 
-        # location isn't a measurement we want to log.
-        location = data.pop('location', 'unset location')
-
-        if not hostname:
-            hostname = platform.node()
-
         for name, value in data.items():
-            # payload = {
-            #     'measurement': name,
-            #     'tags': {'host': hostname, 'location': location},
-            #     'fields': {'value': float(value)},
-            # }
             point = (
                 Point('office')
                 .tag("reading", name)
-                .tag("host", hostname)
-                .tag('location', location)
+                .tag("hostname", hostname)
+                .tag("location", location)
                 .field("value", value)
             )
             self.write_api.write(bucket=self.bucket, org=self.org, record=point)
