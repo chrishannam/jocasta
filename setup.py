@@ -29,7 +29,8 @@ setuptools.setup(
         'psutil~=5.9.4',
         'tabulate~=0.9.0',
         'pycryptodome',
-        'tapo-plug'
+        'tapo-plug',
+        'confluent-kafka==1.8.2'
     ],
     include_package_data=True,
     entry_points={'console_scripts': ['jocasta=jocasta.collector:main', 'tapo=jocasta.tapo:main']},
