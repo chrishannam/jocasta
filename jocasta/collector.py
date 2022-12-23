@@ -24,14 +24,18 @@ LEVELS = {
     'debug': logging.DEBUG,
 }
 
+logger = logging.getLogger(__name__)
+loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
+
+
 
 @click.command()
-@click.option('--port', '-p') # , type=click.Path(exists=True))
+@click.option('--port', '-p', type=click.Path(exists=True))
+@click.option('--forever', '-f', default=False, required=False)
 @click.option('--config-file', '-c', required=False, type=click.Path(exists=True))
 @click.option('--log-level', '-l', default='error')
-def main(port, config_file, log_level):
+def main(port, forever, config_file, log_level):
 
-    configs = load_config(config_file)
     level = LEVELS.get(log_level)
     logging.basicConfig(
         level=level,
@@ -39,14 +43,26 @@ def main(port, config_file, log_level):
         datefmt='%Y-%m-%d %H:%M:%S',
     )
 
-    logger = logging.getLogger(__name__)
-    loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
     for logger in loggers:
         logger.setLevel(level)
 
     logger.debug('Starting...')
-
+    configs = load_config(config_file)
+    connectors = EnabledConnectors(configs)
     sensor_reader = SerialSensor(port=port)
+
+    if forever:
+        while True:
+            try:
+                get_reading(connectors, sensor_reader, configs)
+            except Exception as esc:
+                logger.exception(esc)
+    else:
+        get_reading(connectors, sensor_reader, configs)
+
+
+def get_reading(connectors, sensor_reader, configs):
+
     reading = sensor_reader.read()
     display_table(reading)
 
@@ -54,7 +70,6 @@ def main(port, config_file, log_level):
     hostname = platform.node()
 
     if reading:
-        connectors = EnabledConnectors(configs)
         for conn in connectors.connectors:
             logger.debug(f'Reading: {reading}')
 
@@ -63,23 +78,6 @@ def main(port, config_file, log_level):
             conn.send(data=reading, location=location, hostname=hostname)
     else:
         print('Unable to get reading.')
-
-
-# def setup_cs(config):
-#     connectors = {}
-#     for name, section in config.items():
-#         args = convert_config_stanza(section)
-#         if name == 'csv_file':
-#             connectors[name] = csv_file.CSVFileConnector(**args)
-#         elif name == 'file_system':
-#             connectors[name] = file_system.FileSystemConnector(**args)
-#         elif name == 'io_adafruit':
-#             connectors[name] = io_adafruit.IOAdafruitConnector(**args)
-#         elif name == 'influxdb':
-#             connectors[name] = influx.InfluxDBConnector(**args)
-#         elif name == 'kafka':
-#             connectors[name] = influx.InfluxDBConnector(**args)
-#     return connectors
 
 
 def display_table(reading: Dict):
