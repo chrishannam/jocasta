@@ -16,7 +16,7 @@ jobs:
           command: make test
           name: Test
 
-workflows:
-  main:
+main:
     jobs:
-      - build-and-test
+      - python/test:
+          test-tool: pytest
