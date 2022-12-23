@@ -2,6 +2,7 @@
 Generic collector code to run config file
 """
 import platform
+from time import sleep
 from typing import Dict
 
 from tabulate import tabulate
@@ -28,10 +29,9 @@ logger = logging.getLogger(__name__)
 loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
 
 
-
 @click.command()
 @click.option('--port', '-p', type=click.Path(exists=True))
-@click.option('--forever', '-f', default=False, required=False)
+@click.option('--forever', '-f', default=False, is_flag=True)
 @click.option('--config-file', '-c', required=False, type=click.Path(exists=True))
 @click.option('--log-level', '-l', default='error')
 def main(port, forever, config_file, log_level):
@@ -55,6 +55,7 @@ def main(port, forever, config_file, log_level):
         while True:
             try:
                 get_reading(connectors, sensor_reader, configs)
+                sleep(5)
             except Exception as esc:
                 logger.exception(esc)
     else:

@@ -49,3 +49,7 @@ class TapoConnector:
             except Exception as exc:
                 logger.exception(exc)
         return data
+
+    def send(self, *_, **__):
+        """ Not used"""
+        pass
