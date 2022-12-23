@@ -8,10 +8,8 @@ jobs:
     executor: python/default
     steps:
       - checkout
-      - python/load-cache
       - python/install-deps:
           dependency-file: test_requirements.txt
-      - python/save-cache
       - run:
           command: make test
           name: Test
