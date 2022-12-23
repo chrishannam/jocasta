@@ -37,16 +37,18 @@ class InfluxDBConnector:
         self.send_payload(data, hostname=hostname, location=location)
         logger.info('Payload sent')
 
-    def send_tapo(self, section, data, device_name=None):
+    def send_tapo(self, data, name):
 
-        for name, value in data.items():
-            point = (
-                Point(device_name)
-                .tag("host", device_name)
-                .tag('reading', section)
-                .field("value", float(value))
-            )
-            self.write_api.write(bucket=self.bucket, org=self.org, record=point)
+        for field, value in data.items():
+            logger.info('Sending: %s -> %s', field, value)
+            for k, v in value.items():
+                point = (
+                    Point(name)
+                    .tag('reading_type', field)
+                    .tag('time_range', k)
+                    .field("value", float(v))
+                )
+                self.write_api.write(bucket=self.bucket, org=self.org, record=point)
 
     def send_payload(self, data: Dict, hostname: str, location: str = None) -> bool:
         """

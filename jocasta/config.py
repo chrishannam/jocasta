@@ -63,6 +63,19 @@ class LocalConfiguration:
 
 
 @dataclass
+class TapoPlug:
+    name: str
+    ipaddress: str
+
+
+@dataclass
+class TapoConfiguration:
+    plugs: List[TapoPlug]
+    email: str
+    password: str
+
+
+@dataclass
 class TemperatureRanges:
     maximum: float
     minimum: float
@@ -71,28 +84,21 @@ class TemperatureRanges:
 @dataclass
 class ConnectorsConfiguration:
     kafka: Union[KafkaConfiguration, None] = None
+    tapo: Union[TapoConfiguration, None] = None
     influxdb: Union[InfluxDBConfiguration, None] = None
     file_system: Union[FileSystemConfiguration, None] = None
     temperature_ranges: Union[TemperatureRanges, None] = None
 
     def enabled_configs(self) -> List:
         connectors_enabled = []
-        for i in ['kafka', 'influxdb', 'file_system']:
+        for i in ['kafka', 'influxdb', 'file_system', 'tapo']:
             conn = getattr(self, i)
             if conn:
                 connectors_enabled.append(conn)
         return connectors_enabled
 
 
-# class Connectors:
-#     def __init__(self, config: ConnectorsConfiguration):
-#         self.config = config
-#         self.kafka = None
-#         self.influxdb = None
-#         self.file_system = None
-
-
-def load_config(filename=None,) -> ConnectorsConfiguration:
+def load_config(filename=None) -> ConnectorsConfiguration:
     if not filename:
         filename: Path = HOME / '.config' / CONFIG_FILE_NAME
 
@@ -135,6 +141,21 @@ def load_config(filename=None,) -> ConnectorsConfiguration:
         elif section == 'local':
             connector_config.local = LocalConfiguration(
                 location=config[section]['location'],
+            )
+        elif section == 'tapo':
+            plugs = []
+            for plug in config[section].get('plugs', '').split(','):
+                plugs.append(
+                    TapoPlug(
+                        name=plug.split(':')[0],
+                        ipaddress=plug.split(':')[1],
+                    )
+                )
+
+            connector_config.tapo = TapoConfiguration(
+                email=config[section]['email'],
+                password=config[section]['password'],
+                plugs=plugs,
             )
 
     return connector_config

@@ -2,9 +2,11 @@ from jocasta.config import ConnectorsConfiguration
 from jocasta.config import FileSystemConfiguration
 from jocasta.config import InfluxDBConfiguration
 from jocasta.config import KafkaConfiguration
+from jocasta.config import TapoConfiguration
 from jocasta.connectors.file_system import FileSystemConnector
 from jocasta.connectors.influxdb import InfluxDBConnector
 from jocasta.connectors.kafka import KafkaConnector
+from jocasta.connectors.tapo import TapoConnector
 
 
 class EnabledConnectors:
@@ -20,3 +22,6 @@ class EnabledConnectors:
             elif isinstance(conf, FileSystemConfiguration):
                 self.file_system = FileSystemConnector(configuration=conf)
                 self.connectors.append(self.file_system)
+            elif isinstance(conf, TapoConfiguration):
+                self.tapo = TapoConnector(configuration=conf)
+                self.connectors.append(self.tapo)
