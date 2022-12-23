@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  python: circleci/python@2.1.1
+  python: circleci/python@0.3.2
 
 jobs:
   build-and-test:
@@ -16,7 +16,7 @@ jobs:
           command: make test
           name: Test
 
-main:
+workflows:
+  main:
     jobs:
-      - python/test:
-          test-tool: pytest
+      - build-and-test
