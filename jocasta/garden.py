@@ -15,7 +15,6 @@ from scd4x import SCD4X
 import click
 import logging
 
-from jocasta.validators import validate_temperature
 
 LEVELS = {
     'critical': logging.CRITICAL,
@@ -67,26 +66,19 @@ def main(port, forever, config_file, log_level):
 def get_reading(connectors, sensor_reader, configs):
 
     co2, temperature, relative_humidity, timestamp = sensor_reader.measure()
-    display_table(co2)
 
     location = configs.local.location
     hostname = platform.node()
     reading = {'CO2': co2}
+    logger.error(f'Reading: {reading}')
 
     if co2:
         for conn in connectors.connectors:
-            logger.info(f'CO2: {co2}')
             conn.send(data=reading, location=location, hostname=hostname)
     else:
-        print('Unable to get reading.')
+        logger.error('Unable to get reading.')
 
-
-def display_table(reading: float):
-    table_data = [
-        ['CO2'],
-        [reading],
-    ]
-    print(tabulate(table_data, tablefmt='fancy_grid'))
+    print(reading)
 
 
 if __name__ == '__main__':
