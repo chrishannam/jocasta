@@ -159,3 +159,4 @@ def load_config(filename=None) -> ConnectorsConfiguration:
             )
 
     return connector_config
+

@@ -10,12 +10,12 @@ from tabulate import tabulate
 from jocasta.config import ConnectorsConfiguration
 from jocasta.config import load_config
 from jocasta.connectors.enabled_connectors import EnabledConnectors
-from jocasta.inputs.serial_connector import SerialSensor
+from scd4x import SCD4X
 
 import click
 import logging
 
-from jocasta.validators import validate_temperature
+from jocasta.constants import InfluxdbPointNames
 
 LEVELS = {
     'critical': logging.CRITICAL,
@@ -31,11 +31,10 @@ loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
 
 
 @click.command()
-@click.option('--port', '-p', type=click.Path(exists=True))
 @click.option('--forever', '-f', default=False, is_flag=True)
 @click.option('--config-file', '-c', required=False, type=click.Path(exists=True))
 @click.option('--log-level', '-l', default='error')
-def main(port, forever, config_file, log_level):
+def main(forever, config_file, log_level):
 
     level = LEVELS.get(log_level)
     logging.basicConfig(
@@ -50,7 +49,8 @@ def main(port, forever, config_file, log_level):
     logger.debug('Starting...')
     configs: ConnectorsConfiguration = load_config(config_file)
     connectors = EnabledConnectors(configs)
-    sensor_reader = SerialSensor(port=port)
+    sensor_reader = SCD4X(quiet=False)
+    sensor_reader.start_periodic_measurement()
 
     if forever:
         while True:
@@ -65,29 +65,19 @@ def main(port, forever, config_file, log_level):
 
 def get_reading(connectors, sensor_reader, configs):
 
-    reading = sensor_reader.read()
-    display_table(reading)
+    co2, temperature, relative_humidity, timestamp = sensor_reader.measure()
 
     location = configs.local.location
     hostname = platform.node()
+    reading = {'CO2': co2}
 
-    if reading:
+    if co2:
         for conn in connectors.connectors:
-            logger.debug(f'Reading: {reading}')
-
-            if hasattr(connectors, 'temperature_ranges'):
-                reading = validate_temperature(reading=reading, valid_range=connectors.temperature_ranges)
-            conn.send(data=reading, location=location, hostname=hostname)
+            conn.send(name=InfluxdbPointNames.environment.value, data=reading, location=location, hostname=hostname)
     else:
-        print('Unable to get reading.')
+        logger.error('Unable to get reading.')
 
-
-def display_table(reading: Dict):
-    table_data = [
-        [i.capitalize() for i in reading.keys()],
-        [i for i in reading.values()],
-    ]
-    print(tabulate(table_data, tablefmt='fancy_grid'))
+    print(reading)
 
 
 if __name__ == '__main__':

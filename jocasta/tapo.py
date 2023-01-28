@@ -1,10 +1,6 @@
 """
 Office etc
 """
-from typing import Dict
-
-from tapo_plug import tapoPlugApi
-import json
 
 from jocasta.config import load_config
 from jocasta.connectors.enabled_connectors import EnabledConnectors
@@ -22,5 +18,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-# response = tapoPlugApi.getDeviceInfo(device)
-#response = tapoPlugApi.getPlugUsage(device)
