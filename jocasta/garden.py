@@ -15,6 +15,7 @@ from scd4x import SCD4X
 import click
 import logging
 
+from jocasta.constants import InfluxdbPointNames
 
 LEVELS = {
     'critical': logging.CRITICAL,
@@ -30,11 +31,10 @@ loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
 
 
 @click.command()
-@click.option('--port', '-p', type=click.Path(exists=True))
 @click.option('--forever', '-f', default=False, is_flag=True)
 @click.option('--config-file', '-c', required=False, type=click.Path(exists=True))
 @click.option('--log-level', '-l', default='error')
-def main(port, forever, config_file, log_level):
+def main(forever, config_file, log_level):
 
     level = LEVELS.get(log_level)
     logging.basicConfig(
@@ -70,11 +70,10 @@ def get_reading(connectors, sensor_reader, configs):
     location = configs.local.location
     hostname = platform.node()
     reading = {'CO2': co2}
-    logger.error(f'Reading: {reading}')
 
     if co2:
         for conn in connectors.connectors:
-            conn.send(data=reading, location=location, hostname=hostname)
+            conn.send(name=InfluxdbPointNames.environment.value, data=reading, location=location, hostname=hostname)
     else:
         logger.error('Unable to get reading.')
 

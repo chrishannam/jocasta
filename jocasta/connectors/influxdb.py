@@ -29,9 +29,10 @@ class InfluxDBConnector:
         self.bucket = configuration.bucket
         self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
 
-    def send(self, data: Dict, hostname: str, location: str) -> None:
+    def send(self, name: str, data: Dict, hostname: str, location: str) -> None:
         """
         Send the data over to the Influx server.
+        name is the high level name for the all the points to be mapped under
         """
         logger.info('Sending payload to InfluxDB server')
         self.send_payload(data, hostname=hostname, location=location)
@@ -50,16 +51,17 @@ class InfluxDBConnector:
                 )
                 self.write_api.write(bucket=self.bucket, org=self.org, record=point)
 
-    def send_payload(self, data: Dict, hostname: str, location: str = None) -> bool:
+    def send_payload(self, name: str, data: Dict, hostname: str, location: str = None) -> bool:
         """
         Break out each reading into measurements that Influx will understand.
+        name is the high level name for the all the points to be mapped under
         """
         logger.info('Building payload for Influxdb')
 
-        for name, value in data.items():
+        for field, value in data.items():
             point = (
-                Point('office')
-                .tag("reading", name)
+                Point(name)
+                .tag("reading", field)
                 .tag("hostname", hostname)
                 .tag("location", location)
                 .field("value", value)

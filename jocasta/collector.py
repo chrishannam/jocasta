@@ -7,6 +7,7 @@ from typing import Dict
 
 from tabulate import tabulate
 
+from jocasta.config import ConnectorsConfiguration
 from jocasta.config import load_config
 from jocasta.connectors.enabled_connectors import EnabledConnectors
 from jocasta.inputs.serial_connector import SerialSensor
@@ -43,11 +44,11 @@ def main(port, forever, config_file, log_level):
         datefmt='%Y-%m-%d %H:%M:%S',
     )
 
-    for logger in loggers:
-        logger.setLevel(level)
+    for logg in loggers:
+        logg.setLevel(level)
 
     logger.debug('Starting...')
-    configs = load_config(config_file)
+    configs: ConnectorsConfiguration = load_config(config_file)
     connectors = EnabledConnectors(configs)
     sensor_reader = SerialSensor(port=port)
 
