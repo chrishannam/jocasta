@@ -5,7 +5,7 @@ Currently supports:
     * Kafka
     * InfluxDB
 
-By default the config should be located in ~/.config/race_strategist/config.ini
+By default, the config should be located in ~/.config/race_strategist/config.ini
 
 Example file:
 [influxdb]
@@ -36,6 +36,28 @@ logger = logging.getLogger(__name__)
 
 HOME: Path = Path.home()
 CONFIG_FILE_NAME: str = 'jocasta.ini'
+
+
+# ==========
+# | Inputs |
+# ==========
+@dataclass
+class ArduinoConfiguration:
+    port: str
+
+
+@dataclass
+class GardenCO2Configuration:
+    pass
+
+
+# ===========
+# | Outputs |
+# ===========
+@dataclass
+class KafkaConfiguration:
+    bootstrap_servers: str
+    topics: str
 
 
 @dataclass
@@ -98,6 +120,12 @@ class ConnectorsConfiguration:
         return connectors_enabled
 
 
+@dataclass
+class InputConfigurations:
+    arduino: Union[ArduinoConfiguration, None] = None
+    garden_co2: Union[GardenCO2Configuration, None] = None
+
+
 def load_config(filename=None) -> ConnectorsConfiguration:
     if not filename:
         filename: Path = HOME / '.config' / CONFIG_FILE_NAME
@@ -105,6 +133,7 @@ def load_config(filename=None) -> ConnectorsConfiguration:
     config = configparser.ConfigParser()
     config_file = Path(filename)
     connector_config = ConnectorsConfiguration()
+    input_config = InputConfigurations()
 
     if config_file.is_file():
         config.read(filename)
@@ -118,6 +147,13 @@ def load_config(filename=None) -> ConnectorsConfiguration:
                 bootstrap_servers=config[section]['bootstrap_servers'],
                 topics=config[section]['topics']
             )
+
+        elif section == 'inputs':
+            for name, value in config[section]:
+                if name == 'arduino':
+                    input_config.arduino = ArduinoConfiguration(port=value)
+                elif name == 'garden' and value == 'co2':
+                    input_config.garden_co2 = GardenCO2Configuration()
 
         elif section == 'influxdb':
             connector_config.influxdb = InfluxDBConfiguration(
@@ -142,6 +178,7 @@ def load_config(filename=None) -> ConnectorsConfiguration:
             connector_config.local = LocalConfiguration(
                 location=config[section]['location'],
             )
+
         elif section == 'tapo':
             plugs = []
             for plug in config[section].get('plugs', '').split(','):

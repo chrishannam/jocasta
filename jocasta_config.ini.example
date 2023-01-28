@@ -20,3 +20,7 @@ file_name = /tmp/sensor_data.json
 [temperature_ranges]
 maximum = 100.0
 minimum = -10.0
+
+[inputs]
+arduino=true
+garden_co2=true

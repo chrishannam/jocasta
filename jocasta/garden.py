@@ -3,9 +3,6 @@ Generic collector code to run config file
 """
 import platform
 from time import sleep
-from typing import Dict
-
-from tabulate import tabulate
 
 from jocasta.config import ConnectorsConfiguration
 from jocasta.config import load_config
