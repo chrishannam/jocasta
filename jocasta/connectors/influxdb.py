@@ -49,16 +49,26 @@ class InfluxDBConnector:
                 continue
 
             if name == 'tapo':
-                self.send_tapo(data)
+                for field_name, value in data.items():
+                    self.send_tapo(field_name, value)
             else:
                 self.send_payload(readings, hostname=hostname, location=location)
 
         logger.info('Payload sent')
 
-    def send_tapo(self, data, name):
+    def send_tapo(self, name, data):
 
         for field, value in data.items():
             logger.info('Sending: %s -> %s', field, value)
+            if isinstance(value, bool):
+                point = (
+                    Point(name)
+                    .tag('reading_type', field)
+                    .field("value", 1.0 if value is True else 0.0)
+                )
+                self.write_api.write(bucket=self.bucket, org=self.org, record=point)
+                continue
+
             for k, v in value.items():
                 point = (
                     Point(name)
