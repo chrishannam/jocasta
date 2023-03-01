@@ -1,26 +1,35 @@
-[csv_file]
-path = /tmp/sensor_data.csv
-
-[io_adafruit]
-username = Your name
-key = asdfgsdfgadfgsdfg
-feeds = office.office-temperature,office.office-light,office.office-humidity
-measurements = temperature,light,humidity
-
-[influxdb]
-host = 192.160.0.100
-port = 8086
-password = secret
-username = username
-database = db_name
-
-[file_system]
-file_name = /tmp/sensor_data.json
-
+# Jocasta configs
 [temperature_ranges]
 maximum = 100.0
 minimum = -10.0
 
-[inputs]
-arduino=true
-garden_co2=true
+[jocasta]
+location=office
+
+# |=========|
+# | inputs  |
+# |=========|
+[arduino]
+port=/dev/ttyUSB0
+
+[pimoroni_garden]
+sensors=co2
+
+# |=========|
+# | outputs |
+# |=========|
+
+[influxdb]
+url = 192.168.0.42:8086
+bucket = house_bucket_name
+org = Jocasta
+token = KrEoVBVEbigtoken====
+
+[file_system]
+file_name = /tmp/sensor_data.json
+
+[tapo_plugs]
+email=tap@rmail.com
+password=tapo_pass
+# device name and ipaddress
+ipaddresses=heater:192.168.0.51,driving_rig:192.168.0.52

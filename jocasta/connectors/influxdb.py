@@ -1,4 +1,5 @@
 import json
+from dataclasses import dataclass
 
 from influxdb_client import InfluxDBClient
 from influxdb_client import Point
@@ -7,7 +8,6 @@ import logging
 import platform
 from typing import Dict, List
 
-from jocasta.config import InfluxDBConfiguration
 
 logging.basicConfig(
     level=logging.ERROR,
@@ -16,6 +16,14 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class InfluxDBConfiguration:
+    url: str
+    token: str
+    org: str
+    bucket: str
 
 
 class InfluxDBConnector:

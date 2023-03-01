@@ -24,7 +24,21 @@ from pathlib import Path
 from dataclasses import dataclass
 import logging
 from typing import List
+from typing import Tuple
 from typing import Union
+
+from jocasta.connectors.file_system import FileSystemConfiguration
+from jocasta.connectors.file_system import FileSystemConnector
+from jocasta.connectors.influxdb import InfluxDBConfiguration
+from jocasta.connectors.influxdb import InfluxDBConnector
+from jocasta.connectors.kafka import KafkaConfiguration
+from jocasta.connectors.kafka import KafkaConnector
+from jocasta.connectors.tapo import TapoConfiguration
+from jocasta.connectors.tapo import TapoConnector
+from jocasta.connectors.tapo import TapoPlug
+from jocasta.inputs.pimoroni_garden_board.co2 import CO2Sensor
+from jocasta.inputs.serial_connector import ArduinoConfiguration
+from jocasta.inputs.serial_connector import ArduinoSensorConnector
 
 logging.basicConfig(
     level=logging.INFO,
@@ -41,60 +55,16 @@ CONFIG_FILE_NAME: str = 'jocasta.ini'
 # ==========
 # | Inputs |
 # ==========
-@dataclass
-class ArduinoConfiguration:
-    port: str
 
-
-@dataclass
-class GardenCO2Configuration:
-    pass
 
 
 # ===========
 # | Outputs |
 # ===========
-@dataclass
-class KafkaConfiguration:
-    bootstrap_servers: str
-    topics: str
-
-
-@dataclass
-class KafkaConfiguration:
-    bootstrap_servers: str
-    topics: str
-
-
-@dataclass
-class InfluxDBConfiguration:
-    url: str
-    token: str
-    org: str
-    bucket: str
-
-
-@dataclass
-class FileSystemConfiguration:
-    filename: str
-
 
 @dataclass
 class LocalConfiguration:
     location: str
-
-
-@dataclass
-class TapoPlug:
-    name: str
-    ipaddress: str
-
-
-@dataclass
-class TapoConfiguration:
-    plugs: List[TapoPlug]
-    email: str
-    password: str
 
 
 @dataclass
@@ -104,16 +74,14 @@ class TemperatureRanges:
 
 
 @dataclass
-class ConnectorsConfiguration:
-    kafka: Union[KafkaConfiguration, None] = None
-    tapo: Union[TapoConfiguration, None] = None
-    influxdb: Union[InfluxDBConfiguration, None] = None
+class OutputConnectors:
+    kafka: Union[KafkaConnector, None] = None
+    influxdb: Union[InfluxDBConnector, None] = None
     file_system: Union[FileSystemConfiguration, None] = None
-    temperature_ranges: Union[TemperatureRanges, None] = None
 
     def enabled_configs(self) -> List:
         connectors_enabled = []
-        for i in ['kafka', 'influxdb', 'file_system', 'tapo']:
+        for i in ['kafka', 'influxdb', 'file_system']:
             conn = getattr(self, i)
             if conn:
                 connectors_enabled.append(conn)
@@ -121,63 +89,75 @@ class ConnectorsConfiguration:
 
 
 @dataclass
-class InputConfigurations:
-    arduino: Union[ArduinoConfiguration, None] = None
-    garden_co2: Union[GardenCO2Configuration, None] = None
+class InputConnectors:
+    arduino: Union[ArduinoSensorConnector, None] = None
+    garden_co2: Union[CO2Sensor, None] = None
+    tapo_plugs: Union[TapoConnector, None] = None
+
+    def get_arduino_reading(self):
+        if self.arduino:
+            return self.arduino.get_reading()
+        return None
+
+    def get_garden_co2_reading(self):
+        if self.garden_co2:
+            return self.garden_co2.get_reading()
+        return None
+
+    def get_tapo_plug_reading(self):
+        if self.tapo_plugs:
+            return self.tapo_plugs.get_reading()
+        return None
 
 
-def load_config(filename=None) -> ConnectorsConfiguration:
+def load_config(filename=None) -> Tuple[OutputConnectors, InputConnectors]:
     if not filename:
         filename: Path = HOME / '.config' / CONFIG_FILE_NAME
 
     config = configparser.ConfigParser()
     config_file = Path(filename)
-    connector_config = ConnectorsConfiguration()
-    input_config = InputConfigurations()
+    output_connectors = OutputConnectors()
+    input_connectors = InputConnectors()
 
     if config_file.is_file():
         config.read(filename)
     else:
         logger.warning('Unable to find config file.')
-        return connector_config
+        return output_connectors
 
     for section in config.keys():
+        # outputs
         if section == 'kafka':
-            connector_config.kafka = KafkaConfiguration(
-                bootstrap_servers=config[section]['bootstrap_servers'],
-                topics=config[section]['topics']
+            output_connectors.kafka = KafkaConnector(KafkaConfiguration(
+                    bootstrap_servers=config[section]['bootstrap_servers'],
+                    topics=config[section]['topics']
+                )
             )
 
-        elif section == 'inputs':
-            for name, value in config[section]:
-                if name == 'arduino':
-                    input_config.arduino = ArduinoConfiguration(port=value)
-                elif name == 'garden' and value == 'co2':
-                    input_config.garden_co2 = GardenCO2Configuration()
-
         elif section == 'influxdb':
-            connector_config.influxdb = InfluxDBConfiguration(
-                url=config[section]['url'],
-                token=config[section]['token'],
-                org=config[section]['org'],
-                bucket=config[section]['bucket'],
+            output_connectors.influxdb = InfluxDBConnector(InfluxDBConfiguration(
+                    url=config[section]['url'],
+                    token=config[section]['token'],
+                    org=config[section]['org'],
+                    bucket=config[section]['bucket'],
+                )
+            )
+        elif section == 'jocasta':
+            output_connectors.local = LocalConfiguration(
+                location=config[section]['location'],
             )
 
         elif section == 'file_system':
-            connector_config.file_system = FileSystemConfiguration(
-                filename=config[section]['filename'],
+            output_connectors.file_system = FileSystemConnector(
+                FileSystemConfiguration(config[section]['filename'])
             )
 
-        elif section == 'temperature_ranges':
-            connector_config.temperature_ranges = TemperatureRanges(
-                maximum=float(config[section]['maximum']),
-                minimum=float(config[section]['minimum']),
-            )
+        # Inputs
+        elif section == 'arduino':
+            input_connectors.arduino = ArduinoSensorConnector(ArduinoConfiguration(port=config[section]['port']))
 
-        elif section == 'local':
-            connector_config.local = LocalConfiguration(
-                location=config[section]['location'],
-            )
+        elif section == 'pimoroni_garden':
+            input_connectors.garden_co2 = CO2Sensor()
 
         elif section == 'tapo':
             plugs = []
@@ -189,11 +169,19 @@ def load_config(filename=None) -> ConnectorsConfiguration:
                     )
                 )
 
-            connector_config.tapo = TapoConfiguration(
+            input_connectors.tapo_plugs = TapoConnector(TapoConfiguration(
                 email=config[section]['email'],
                 password=config[section]['password'],
                 plugs=plugs,
-            )
+            ))
 
-    return connector_config
+        # elif section == 'temperature_ranges':
+        #     connector_config.temperature_ranges = TemperatureRanges(
+        #         maximum=float(config[section]['maximum']),
+        #         minimum=float(config[section]['minimum']),
+        #     )
+
+
+
+    return output_connectors, input_connectors
 

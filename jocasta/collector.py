@@ -2,15 +2,16 @@
 Generic collector code to run config file
 """
 import platform
+from dataclasses import dataclass
 from time import sleep
 from typing import Dict
+from typing import Optional
 
 from tabulate import tabulate
 
-from jocasta.config import ConnectorsConfiguration
+from jocasta.config import InputConnectors
+from jocasta.config import OutputConnectors
 from jocasta.config import load_config
-from jocasta.connectors.enabled_connectors import EnabledConnectors
-from jocasta.inputs.serial_connector import SerialSensor
 
 import click
 import logging
@@ -48,19 +49,40 @@ def main(port, forever, config_file, log_level):
         logg.setLevel(level)
 
     logger.debug('Starting...')
-    configs: ConnectorsConfiguration = load_config(config_file)
-    connectors = EnabledConnectors(configs)
-    sensor_reader = SerialSensor(port=port)
+    output_connectors, input_connections = load_config(config_file)
 
     if forever:
         while True:
             try:
-                get_reading(connectors, sensor_reader, configs)
-                sleep(5)
+                arduino_reading = input_connections.arduino.get_reading()
+                tapo_reading = input_connections.get_tapo_plugs_readings()
+                sleep(1)
             except Exception as esc:
                 logger.exception(esc)
     else:
-        get_reading(connectors, sensor_reader, configs)
+        readings = get_readings(input_connections)
+        if readings.arduino:
+            print(readings.arduino)
+        if readings.tapo:
+            print(readings.tapo)
+        if readings.garden:
+            print(readings.garden)
+
+
+@dataclass
+class Readings:
+    arduino: Optional[Dict] = None
+    tapo: Optional[Dict] = None
+    garden: Optional[Dict] = None
+
+
+def get_readings(input_connections: InputConnectors):
+
+    return Readings(
+        arduino=input_connections.get_arduino_reading(),
+        tapo=input_connections.get_tapo_plug_reading(),
+        garden=input_connections.get_garden_co2_reading(),
+    )
 
 
 def get_reading(connectors, sensor_reader, configs):

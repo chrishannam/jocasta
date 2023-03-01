@@ -11,11 +11,13 @@ sensor = SerialSensor(port='ttyUSB0', json_data=False)
 import glob
 import json
 import logging
+from dataclasses import dataclass
 from json import JSONDecodeError
 
 import serial
 import os.path
 import time
+
 
 # usual linux ports
 PORTS = ['ttyUSB0', 'ttyUSB1', 'ttyAMA0', 'ttyACM0']
@@ -31,10 +33,15 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class SerialSensor:
-    def __init__(self, port=None, json_data=True, debug=True):
-        if port:
-            self.serial_port = port
+@dataclass
+class ArduinoConfiguration:
+    port: str
+
+
+class ArduinoSensorConnector:
+    def __init__(self, config: ArduinoConfiguration = None, json_data=True, debug=True):
+        if config.port:
+            self.serial_port = config.port
         else:
             logger.info('Finding port.')
             self.serial_port = _detect_port()
@@ -45,7 +52,7 @@ class SerialSensor:
 
         logger.debug(f'Using {self.serial_port} as serial port')
 
-    def read(self, timeout=10):
+    def get_reading(self, timeout=10):
 
         if not self.serial_port:
             logger.error('Unable to find anything on the serial port to read from.')

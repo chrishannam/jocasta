@@ -1,7 +1,11 @@
 import json
+from dataclasses import dataclass
 from typing import Dict
 
-from jocasta.config import FileSystemConfiguration
+
+@dataclass
+class FileSystemConfiguration:
+    filename: str
 
 
 class FileSystemConnector:

@@ -17,7 +17,7 @@ class CO2Sensor:
         self.device = SCD4X(quiet=quiet)
         self.device.start_periodic_measurement()
 
-    def reading(self):
+    def get_reading(self):
         co2, temperature, humidity, timestamp = self.device.measure()
         return CO2Reading(
             co2=co2,
