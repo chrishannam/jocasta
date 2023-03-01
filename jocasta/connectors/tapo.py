@@ -48,8 +48,10 @@ class TapoConnector:
             }
             try:
                 result = json.loads(tapoPlugApi.getPlugUsage(device))
-
-                data[plug.name] = {}
+                power_state: bool = json.loads(tapoPlugApi.getDeviceRunningInfo(device))['result']['device_on']
+                data[plug.name] = {
+                    'on':  power_state
+                }
 
                 for name, reading in result['result'].items():
                     data[plug.name][name] = {}

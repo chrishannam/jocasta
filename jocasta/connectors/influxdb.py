@@ -37,13 +37,22 @@ class InfluxDBConnector:
         self.bucket = configuration.bucket
         self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
 
-    def send(self, name: str, data: Dict, hostname: str, location: str) -> None:
+    def send(self, readings, hostname: str, location: str) -> None:
         """
         Send the data over to the Influx server.
         name is the high level name for the all the points to be mapped under
         """
         logger.info('Sending payload to InfluxDB server')
-        self.send_payload(data, hostname=hostname, location=location)
+
+        for name, data in readings.to_dict().items():
+            if not data:
+                continue
+
+            if name == 'tapo':
+                self.send_tapo(data)
+            else:
+                self.send_payload(readings, hostname=hostname, location=location)
+
         logger.info('Payload sent')
 
     def send_tapo(self, data, name):

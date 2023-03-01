@@ -1,10 +1,9 @@
 # Jocasta configs
-[temperature_ranges]
-maximum = 100.0
-minimum = -10.0
-
-[jocasta]
+[local]
 location=office
+temperature_max = 55.0
+temperature_min = -10.0
+
 
 # |=========|
 # | inputs  |
@@ -13,7 +12,13 @@ location=office
 port=/dev/ttyUSB0
 
 [pimoroni_garden]
-sensors=co2
+garden=co2
+
+[tapo_plugs]
+email=tap@rmail.com
+password=tapo_pass
+# device name and ipaddress
+ipaddresses=heater:192.168.0.51,driving_rig:192.168.0.52
 
 # |=========|
 # | outputs |
@@ -28,8 +33,7 @@ token = KrEoVBVEbigtoken====
 [file_system]
 file_name = /tmp/sensor_data.json
 
-[tapo_plugs]
-email=tap@rmail.com
-password=tapo_pass
-# device name and ipaddress
-ipaddresses=heater:192.168.0.51,driving_rig:192.168.0.52
+[kafka]
+bootstrap_servers = 192.168.0.100:9092
+topics=light,temperature,humidity
+
