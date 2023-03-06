@@ -25,18 +25,17 @@ from dataclasses import dataclass
 import logging
 from typing import List
 from typing import Optional
-from typing import Tuple
 from typing import Union
 
-from jocasta.connectors.file_system import FileSystemConfiguration
-from jocasta.connectors.file_system import FileSystemConnector
-from jocasta.connectors.influxdb import InfluxDBConfiguration
-from jocasta.connectors.influxdb import InfluxDBConnector
-from jocasta.connectors.kafka import KafkaConfiguration
-from jocasta.connectors.kafka import KafkaConnector
-from jocasta.connectors.tapo import TapoConfiguration
-from jocasta.connectors.tapo import TapoConnector
-from jocasta.connectors.tapo import TapoPlug
+from jocasta.outputs.file_system import FileSystemConfiguration
+from jocasta.outputs.file_system import FileSystemConnector
+from jocasta.outputs.influxdb import InfluxDBConfiguration
+from jocasta.outputs.influxdb import InfluxDBConnector
+from jocasta.outputs.kafka import KafkaConfiguration
+from jocasta.outputs.kafka import KafkaConnector
+from jocasta.inputs.tapo import TapoConfiguration
+from jocasta.inputs.tapo import TapoConnector
+from jocasta.inputs.tapo import TapoPlug
 from jocasta.inputs.pimoroni_garden_board.co2 import CO2Sensor
 from jocasta.inputs.serial_connector import ArduinoConfiguration
 from jocasta.inputs.serial_connector import ArduinoSensorConnector

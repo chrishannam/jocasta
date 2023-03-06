@@ -3,7 +3,7 @@ Office etc
 """
 
 from jocasta.config import load_config
-from jocasta.connectors.enabled_connectors import EnabledConnectors
+from jocasta.outputs.enabled_connectors import EnabledConnectors
 
 
 def main():

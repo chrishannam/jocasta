@@ -6,7 +6,7 @@ from time import sleep
 
 from jocasta.config import ConnectorsConfiguration
 from jocasta.config import load_config
-from jocasta.connectors.enabled_connectors import EnabledConnectors
+from jocasta.outputs.enabled_connectors import EnabledConnectors
 from scd4x import SCD4X
 
 import click
