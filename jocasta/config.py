@@ -36,7 +36,7 @@ from jocasta.outputs.kafka import KafkaConnector
 from jocasta.inputs.tapo import TapoConfiguration
 from jocasta.inputs.tapo import TapoConnector
 from jocasta.inputs.tapo import TapoPlug
-from jocasta.inputs.pimoroni_garden_board.co2 import CO2Sensor
+from jocasta.inputs.co2 import CO2Sensor
 from jocasta.inputs.serial_connector import ArduinoConfiguration
 from jocasta.inputs.serial_connector import ArduinoSensorConnector
 
