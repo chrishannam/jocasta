@@ -10,10 +10,11 @@ dependencies = [
     "confluent-kafka",
     "influxdb-client",
     "psutil",
-    "pycryptodome",
     "pyserial",
     "tabulate",
-    "tapo-plug"
+    "tapo-plug",
+    "pycrypto>=2.6.1",
+    "pycryptodome>=3.17",
 ]
 license = {text = "MIT"}
 readme = "README.md"

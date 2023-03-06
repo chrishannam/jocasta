@@ -35,13 +35,13 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class ArduinoConfiguration:
-    port: str
+    device: str
 
 
 class ArduinoSensorConnector:
     def __init__(self, config: ArduinoConfiguration = None, json_data=True, debug=True):
-        if config.port:
-            self.serial_port = config.port
+        if config.device:
+            self.serial_port = config.device
         else:
             logger.info('Finding port.')
             self.serial_port = _detect_port()
