@@ -32,7 +32,7 @@ class Readings:
 
     def to_dict(self) -> Dict:
         return {
-            'arduino': self.arduino,
+            'arduino': self.arduino.dict(),
             'tapo': self.tapo,
             'garden': self.garden,
         }

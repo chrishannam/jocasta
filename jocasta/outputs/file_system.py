@@ -18,8 +18,6 @@ class FileSystemConnector:
         """
 
         with open(self.file_name, 'w') as f:
-            output = readings.to_dict()
-            output['arduino'] = output['arduino'].dict()
-            f.write(json.dumps(output, indent=4))
+            f.write(json.dumps(readings.to_dict(), indent=4))
 
         return True

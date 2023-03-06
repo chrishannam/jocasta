@@ -85,9 +85,6 @@ class InfluxDBConnector:
         """
         logger.info('Building payload for Influxdb for: %s', name)
 
-        if name == 'arduino':
-            data = data.dict()
-
         for field, value in data.items():
             point = (
                 Point(name)
