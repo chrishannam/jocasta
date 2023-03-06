@@ -1,11 +1,10 @@
 from datetime import datetime
 
+from pydantic import BaseModel
 from scd4x import SCD4X
-from dataclasses import dataclass
 
 
-@dataclass
-class CO2Reading:
+class CO2Reading(BaseModel):
     co2: int
     temperature: float
     humidity: float

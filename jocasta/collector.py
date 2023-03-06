@@ -59,34 +59,5 @@ class Controller:
 
     def send_readings(self, readings: Readings):
         for output in self.outputs.enabled_connectors():
+            logger.info(f'Sending data to %s', output)
             output.send(readings=readings, hostname=platform.node(), location=self.config.location)
-
-    #
-    # def get_reading(connectors, sensor_reader, configs):
-    #
-    #     reading = sensor_reader.read()
-    #     display_table(reading)
-    #
-    #     location = configs.local.location
-    #     hostname = platform.node()
-    #
-    #     if reading:
-    #         for conn in connectors.connectors:
-    #             logger.debug(f'Reading: {reading}')
-    #
-    #             if hasattr(connectors, 'temperature_ranges'):
-    #                 reading = validate_temperature(reading=reading, valid_range=connectors.temperature_ranges)
-    #             conn.send(data=reading, location=location, hostname=hostname)
-    #     else:
-    #         print('Unable to get reading.')
-    #
-    #
-    # def display_table(reading: Dict):
-    #     table_data = [
-    #         [i.capitalize() for i in reading.keys()],
-    #         [i for i in reading.values()],
-    #     ]
-    #     print(tabulate(table_data, tablefmt='fancy_grid'))
-
-
-

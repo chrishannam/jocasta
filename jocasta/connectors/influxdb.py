@@ -52,7 +52,7 @@ class InfluxDBConnector:
                 for field_name, value in data.items():
                     self.send_tapo(field_name, value)
             else:
-                self.send_payload(readings, hostname=hostname, location=location)
+                self.send_payload(name=name, data=data, hostname=hostname, location=location)
 
         logger.info('Payload sent')
 
@@ -83,7 +83,10 @@ class InfluxDBConnector:
         Break out each reading into measurements that Influx will understand.
         name is the high level name for the all the points to be mapped under
         """
-        logger.info('Building payload for Influxdb')
+        logger.info('Building payload for Influxdb for: %s', name)
+
+        if name == 'arduino':
+            data = data.dict()
 
         for field, value in data.items():
             point = (

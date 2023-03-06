@@ -10,17 +10,18 @@ import click
 import logging
 
 
-LEVELS = {
-    'critical': logging.CRITICAL,
-    'error': logging.ERROR,
-    'warn': logging.WARNING,
-    'warning': logging.WARNING,
-    'info': logging.INFO,
-    'debug': logging.DEBUG,
-}
+loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
+for logger in loggers:
+    logger.setLevel(logging.INFO)
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
 
 logger = logging.getLogger(__name__)
-loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
 
 
 @click.command()
@@ -28,16 +29,6 @@ loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
 @click.option('--config-file', '-c', required=False, type=click.Path(exists=True))
 @click.option('--log-level', '-l', default='error')
 def main(forever, config_file, log_level):
-
-    level = LEVELS.get(log_level)
-    logging.basicConfig(
-        level=level,
-        format='%(asctime)s.%(msecs)03d %(levelname)s: %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
-    )
-
-    for logg in loggers:
-        logg.setLevel(level)
 
     logger.debug('Starting...')
     configuration = load_config(config_file)
@@ -47,16 +38,14 @@ def main(forever, config_file, log_level):
     if forever:
         while True:
             readings: Readings = controller.get_readings()
+            print(f'Arduino: {readings.arduino}')
+            print(f'Tapo: {readings.tapo}')
+            print(f'Garden: {readings.garden}')
             controller.send_readings(readings=readings)
-            a = 1
-    # else:
-    #     readings = get_readings(input_connections)
-    #     if readings.arduino:
-    #         print(readings.arduino)
-    #     if readings.tapo:
-    #         print(readings.tapo)
-    #     if readings.garden:
-    #         print(readings.garden)
+
+    else:
+        readings: Readings = controller.get_readings()
+        controller.send_readings(readings=readings)
 
 
 if __name__ == '__main__':

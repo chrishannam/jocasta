@@ -38,8 +38,10 @@ class TapoConnector:
         self.plugs = configuration.plugs
 
     def get_reading(self):
+
         data = {}
         for plug in self.plugs:
+            logger.info(f'TAPO: Fetching plug: {plug}')
             ip = plug.ipaddress
             device = {
                 'tapoEmail': self.email,

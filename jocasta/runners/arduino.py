@@ -1,5 +1,4 @@
 from time import sleep
-from typing import Dict
 
 import click
 import logging

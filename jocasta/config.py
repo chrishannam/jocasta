@@ -83,16 +83,19 @@ class InputConnectors:
 
     def get_arduino_reading(self):
         if self.arduino:
+            logger.info('Fetching from Arduino')
             return self.arduino.get_reading()
         return None
 
     def get_garden_co2_reading(self):
         if self.garden_co2:
+            logger.info('Fetching from Garden Board')
             return self.garden_co2.get_reading()
         return None
 
     def get_tapo_plug_reading(self):
         if self.tapo_plugs:
+            logger.info('Fetching from Tapo Plugs')
             return self.tapo_plugs.get_reading()
         return None
 
