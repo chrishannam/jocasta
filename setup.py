@@ -21,16 +21,14 @@ setuptools.setup(
         'Operating System :: OS Independent',
     ],
     install_requires=[
-        'adafruit-io~=2.7.0',
-        'click~=8.1.3',
-        'dweepy~=0.3.0',
-        'influxdb-client~=1.34.0',
-        'pyserial~=3.5',
-        'psutil~=5.9.4',
-        'tabulate~=0.9.0',
-        'pycryptodome',
+        'click',
+        'influxdb-client',
+        'pyserial5',
+        'psutil',
+        'tabulate',
+        # 'pycryptodome',
         'tapo-plug',
-        'confluent-kafka==1.8.2'
+        'confluent-kafka'
     ],
     include_package_data=True,
     entry_points={'console_scripts': ['jocasta=jocasta.collector:main', 'tapo=jocasta.tapo:main']},

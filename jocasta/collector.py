@@ -1,21 +1,15 @@
 """
 Generic collector code to run config file
 """
-import platform
-from time import sleep
+from dataclasses import dataclass
 from typing import Dict
+from typing import Optional
 
-from tabulate import tabulate
 
-from jocasta.config import ConnectorsConfiguration
-from jocasta.config import load_config
-from jocasta.connectors.enabled_connectors import EnabledConnectors
-from jocasta.inputs.serial_connector import SerialSensor
-
-import click
+from jocasta.config import Configuration
 import logging
+import platform
 
-from jocasta.validators import validate_temperature
 
 LEVELS = {
     'critical': logging.CRITICAL,
@@ -30,65 +24,40 @@ logger = logging.getLogger(__name__)
 loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
 
 
-@click.command()
-@click.option('--port', '-p', type=click.Path(exists=True))
-@click.option('--forever', '-f', default=False, is_flag=True)
-@click.option('--config-file', '-c', required=False, type=click.Path(exists=True))
-@click.option('--log-level', '-l', default='error')
-def main(port, forever, config_file, log_level):
+@dataclass
+class Readings:
+    arduino: Optional[Dict] = None
+    tapo: Optional[Dict] = None
+    garden: Optional[Dict] = None
 
-    level = LEVELS.get(log_level)
-    logging.basicConfig(
-        level=level,
-        format='%(asctime)s.%(msecs)03d %(levelname)s: %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
-    )
-
-    for logg in loggers:
-        logg.setLevel(level)
-
-    logger.debug('Starting...')
-    configs: ConnectorsConfiguration = load_config(config_file)
-    connectors = EnabledConnectors(configs)
-    sensor_reader = SerialSensor(port=port)
-
-    if forever:
-        while True:
-            try:
-                get_reading(connectors, sensor_reader, configs)
-                sleep(5)
-            except Exception as esc:
-                logger.exception(esc)
-    else:
-        get_reading(connectors, sensor_reader, configs)
+    def to_dict(self) -> Dict:
+        return {
+            'arduino': self.arduino.dict(),
+            'tapo': self.tapo,
+            'garden': self.garden,
+        }
 
 
-def get_reading(connectors, sensor_reader, configs):
+class Controller:
 
-    reading = sensor_reader.read()
-    display_table(reading)
+    def __init__(self, config: Configuration):
+        self.inputs = config.inputs
+        self.outputs = config.outputs
+        self.config = config.configuration
+        self.configuration = config
 
-    location = configs.local.location
-    hostname = platform.node()
+    def get_readings(self):
+        """
+        Collect all available readings
+        """
 
-    if reading:
-        for conn in connectors.connectors:
-            logger.debug(f'Reading: {reading}')
+        return Readings(
+            arduino=self.inputs.get_arduino_reading(),
+            tapo=self.inputs.get_tapo_plug_reading(),
+            garden=self.inputs.get_garden_co2_reading(),
+        )
 
-            if hasattr(connectors, 'temperature_ranges'):
-                reading = validate_temperature(reading=reading, valid_range=connectors.temperature_ranges)
-            conn.send(data=reading, location=location, hostname=hostname)
-    else:
-        print('Unable to get reading.')
-
-
-def display_table(reading: Dict):
-    table_data = [
-        [i.capitalize() for i in reading.keys()],
-        [i for i in reading.values()],
-    ]
-    print(tabulate(table_data, tablefmt='fancy_grid'))
-
-
-if __name__ == '__main__':
-    main()
+    def send_readings(self, readings: Readings):
+        for output in self.outputs.enabled_connectors():
+            logger.info(f'Sending data to %s', output)
+            output.send(readings=readings, hostname=platform.node(), location=self.config.location)

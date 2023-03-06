@@ -1,8 +1,8 @@
 import json
 import logging
+from dataclasses import dataclass
 from typing import Dict
 
-from jocasta.config import KafkaConfiguration
 from confluent_kafka import Producer
 
 
@@ -12,6 +12,12 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class KafkaConfiguration:
+    bootstrap_servers: str
+    topics: str
 
 
 class KafkaConnector:

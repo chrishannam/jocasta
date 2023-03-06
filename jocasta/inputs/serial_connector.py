@@ -11,11 +11,15 @@ sensor = SerialSensor(port='ttyUSB0', json_data=False)
 import glob
 import json
 import logging
+from dataclasses import dataclass
 from json import JSONDecodeError
+from typing import Optional
 
 import serial
 import os.path
 import time
+from pydantic import BaseModel
+
 
 # usual linux ports
 PORTS = ['ttyUSB0', 'ttyUSB1', 'ttyAMA0', 'ttyACM0']
@@ -31,10 +35,21 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class SerialSensor:
-    def __init__(self, port=None, json_data=True, debug=True):
-        if port:
-            self.serial_port = port
+class ArduinoReading(BaseModel):
+    temperature: float
+    humidity: float
+    light: float
+
+
+@dataclass
+class ArduinoConfiguration:
+    device: str
+
+
+class ArduinoSensorConnector:
+    def __init__(self, config: ArduinoConfiguration = None, json_data=True, debug=True):
+        if config.device:
+            self.serial_port = config.device
         else:
             logger.info('Finding port.')
             self.serial_port = _detect_port()
@@ -45,7 +60,7 @@ class SerialSensor:
 
         logger.debug(f'Using {self.serial_port} as serial port')
 
-    def read(self, timeout=10):
+    def get_reading(self, timeout=10):
 
         if not self.serial_port:
             logger.error('Unable to find anything on the serial port to read from.')
@@ -61,12 +76,17 @@ class SerialSensor:
             logger.debug(f'Attempt {i}: Received: {raw_serial}')
 
             if self.json_data and raw_serial:
-                try:
-                    return json.loads(raw_serial)
-                except JSONDecodeError:
-                    logger.debug(f'Failed to decode to JSON: {raw_serial}')
+                if reading := self.convert_to_reading(raw_serial):
+                    return reading
             else:
                 logger.debug('Failed to decode anything')
+
+    def convert_to_reading(self, raw_serial) -> Optional[ArduinoReading]:
+        try:
+            return ArduinoReading(**json.loads(raw_serial))
+        except JSONDecodeError:
+            logger.debug(f'Failed to decode to JSON: {raw_serial}')
+        return None
 
 
 def _detect_port():
@@ -79,7 +99,7 @@ def _detect_port():
             device_path = device
 
     if not device_path:
-        # lets try osx stuff
+        # let's try osx stuff
         for file_name in glob.glob1('/dev', 'tty.usbserial-*'):
             device_path = SERIAL_PORT_PATH_ROOT + file_name
     return device_path

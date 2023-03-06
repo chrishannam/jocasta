@@ -1,13 +1,10 @@
 import json
 import logging
-from typing import Dict
+from dataclasses import dataclass
+from typing import List
 
 from tapo_plug import tapoPlugApi
 
-from jocasta.config import KafkaConfiguration
-from confluent_kafka import Producer
-
-from jocasta.config import TapoConfiguration
 
 logging.basicConfig(
     level=logging.INFO,
@@ -15,6 +12,19 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class TapoPlug:
+    name: str
+    ipaddress: str
+
+
+@dataclass
+class TapoConfiguration:
+    plugs: List[TapoPlug]
+    email: str
+    password: str
 
 
 class TapoConnector:
@@ -27,9 +37,11 @@ class TapoConnector:
         self.password = configuration.password
         self.plugs = configuration.plugs
 
-    def fetch(self):
+    def get_reading(self):
+
         data = {}
         for plug in self.plugs:
+            logger.info(f'TAPO: Fetching plug: {plug}')
             ip = plug.ipaddress
             device = {
                 'tapoEmail': self.email,
@@ -38,8 +50,10 @@ class TapoConnector:
             }
             try:
                 result = json.loads(tapoPlugApi.getPlugUsage(device))
-
-                data[plug.name] = {}
+                power_state: bool = json.loads(tapoPlugApi.getDeviceRunningInfo(device))['result']['device_on']
+                data[plug.name] = {
+                    'on':  power_state
+                }
 
                 for name, reading in result['result'].items():
                     data[plug.name][name] = {}
