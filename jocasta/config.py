@@ -147,7 +147,7 @@ def load_config(filename=None) -> Configuration:
 
         # Inputs
         elif section == 'arduino':
-            configuration.inputs.arduino = ArduinoSensorConnector(ArduinoConfiguration(port=config[section]['port']))
+            configuration.inputs.arduino = ArduinoSensorConnector(ArduinoConfiguration(device=config[section]['device']))
 
         elif section == 'pimoroni_garden':
             configuration.inputs.garden_co2 = CO2Sensor()

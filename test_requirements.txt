@@ -4,3 +4,5 @@ pdm
 pre-commit
 pytest
 pytest-cov
+prettytable
+pydantic

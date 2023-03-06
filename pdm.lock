@@ -33,6 +33,15 @@ version = "2.0.2"
 summary = "Confluent's Python client for Apache Kafka"
 
 [[package]]
+name = "crypto"
+version = "1.4.1"
+summary = "Simple symmetric GPG file encryption and decryption"
+dependencies = [
+    "Naked",
+    "shellescape",
+]
+
+[[package]]
 name = "idna"
 version = "3.4"
 requires_python = ">=3.5"
@@ -70,6 +79,11 @@ name = "psutil"
 version = "5.9.4"
 requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 summary = "Cross-platform lib for process and system monitoring in Python."
+
+[[package]]
+name = "pycrypto"
+version = "2.6.1"
+summary = "Cryptographic modules for Python."
 
 [[package]]
 name = "pycryptodome"
@@ -119,6 +133,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "scd4x"
+version = "0.0.1"
+requires_python = ">=3.6"
+summary = "Driver for the SCD4X CO2 sensor."
+dependencies = [
+    "smbus2",
+]
+
+[[package]]
 name = "setuptools"
 version = "67.5.0"
 requires_python = ">=3.7"
@@ -136,6 +159,12 @@ requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 summary = "Python 2 and 3 compatibility utilities"
 
 [[package]]
+name = "smbus2"
+version = "0.4.2"
+summary = "smbus2 is a drop-in replacement for smbus-cffi/smbus-python in pure Python"
+
+[[package]]
+name = "tabulate"
 name = "tabulate"
 version = "0.9.0"
 requires_python = ">=3.7"
@@ -146,7 +175,7 @@ name = "tapo-plug"
 version = "0.7"
 summary = "A REST API warper for TP-Link Tapo P100/P105."
 dependencies = [
-    "pycryptodome",
+    "Crypto",
     "pkcs7",
     "requests>=1.4",
 ]
@@ -165,7 +194,7 @@ summary = "HTTP library with thread-safe connection pooling, file post, and more
 
 [metadata]
 lock_version = "4.1"
-content_hash = "sha256:bd776002bc3aa55709cfb3bccbcd0ac3ceb0ebd0153771e6eaf655101cec8f5c"
+content_hash = "sha256:c1ed63dcb2547671dab9bdc545773e15b109fe624badb25b455e9335d660ebef"
 
 [metadata.files]
 "certifi 2022.12.7" = [
@@ -301,6 +330,10 @@ content_hash = "sha256:bd776002bc3aa55709cfb3bccbcd0ac3ceb0ebd0153771e6eaf655101
     {url = "https://files.pythonhosted.org/packages/f8/0b/fdf6ab8a32d6ba553f5fd4f65b35c020a3e0a69b31b3666bf06bec672036/confluent_kafka-2.0.2-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:634f1a78a99fa48fe86748b30f5cc96166e0082bbc169697807a448f4e01175c"},
     {url = "https://files.pythonhosted.org/packages/fc/3d/f807d3ac1769774a6e834f83a9317dfdcba127ad3a892fdef629a7091764/confluent_kafka-2.0.2-cp38-cp38-win32.whl", hash = "sha256:f2ac3554429be8ea26e16d83a33cd69ad38a3b6b4d5411beb245d928e4562994"},
 ]
+"crypto 1.4.1" = [
+    {url = "https://files.pythonhosted.org/packages/12/0d/34dce1487b3158a0ccd0e5982cba0259c798c24c0de4cc25ec265b37cd98/crypto-1.4.1.tar.gz", hash = "sha256:8f2ee9756a0265c18845ac097ae447c75cfbde158abe1361b7491619f866a9bd"},
+    {url = "https://files.pythonhosted.org/packages/fc/bb/0b812dc02e6357606228edfbf5808f5ca0a675a84273578c3a199e841cd8/crypto-1.4.1-py2.py3-none-any.whl", hash = "sha256:985120aa86f71545388199f96a2a0e00f7ccfe5ecd14c56355eb399e1a63d164"},
+]
 "idna 3.4" = [
     {url = "https://files.pythonhosted.org/packages/8b/e1/43beb3d38dba6cb420cefa297822eac205a277ab43e5ba5d5c46faf96438/idna-3.4.tar.gz", hash = "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"},
     {url = "https://files.pythonhosted.org/packages/fc/34/3030de6f1370931b9dbb4dad48f6ab1015ab1d32447850b9fc94e60097be/idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
@@ -331,6 +364,9 @@ content_hash = "sha256:bd776002bc3aa55709cfb3bccbcd0ac3ceb0ebd0153771e6eaf655101
     {url = "https://files.pythonhosted.org/packages/99/9c/7a5761f9d2e79e6f781db5b25eeb9e74c2dc533bc52ee4749cb055a32ce9/psutil-5.9.4-cp27-cp27m-win_amd64.whl", hash = "sha256:9120cd39dca5c5e1c54b59a41d205023d436799b1c8c4d3ff71af18535728e94"},
     {url = "https://files.pythonhosted.org/packages/a5/73/35cea01aad1baf901c915dc95ea33a2f271c8ff8cf2f1c73b7f591f1bdf1/psutil-5.9.4-cp36-abi3-macosx_10_9_x86_64.whl", hash = "sha256:54d5b184728298f2ca8567bf83c422b706200bcbbfafdc06718264f9393cfeb7"},
     {url = "https://files.pythonhosted.org/packages/ec/be/b8df2071eda861e65a1b2cec35770bb1f4523737e84a10aa41c53e39e9bc/psutil-5.9.4-cp27-cp27mu-manylinux2010_i686.whl", hash = "sha256:6b92c532979bafc2df23ddc785ed116fced1f492ad90a6830cf24f4d1ea27d24"},
+]
+"pycrypto 2.6.1" = [
+    {url = "https://files.pythonhosted.org/packages/60/db/645aa9af249f059cc3a368b118de33889219e0362141e75d4eaf6f80f163/pycrypto-2.6.1.tar.gz", hash = "sha256:f2ce1e989b272cfcb677616763e0a2e7ec659effa67a88aa92b3a65528f60a3c"},
 ]
 "pycryptodome 3.17" = [
     {url = "https://files.pythonhosted.org/packages/05/6e/ffedda1885ccb5ab52911cfd38ee834c5fa1df1f500f0da34f92b52f70e1/pycryptodome-3.17-cp35-abi3-macosx_10_9_universal2.whl", hash = "sha256:e7debd9c439e7b84f53be3cf4ba8b75b3d0b6e6015212355d6daf44ac672e210"},
@@ -425,6 +461,11 @@ content_hash = "sha256:bd776002bc3aa55709cfb3bccbcd0ac3ceb0ebd0153771e6eaf655101
     {url = "https://files.pythonhosted.org/packages/9d/ee/391076f5937f0a8cdf5e53b701ffc91753e87b07d66bae4a09aa671897bf/requests-2.28.2.tar.gz", hash = "sha256:98b1b2782e3c6c4904938b84c0eb932721069dfdb9134313beff7c83c2df24bf"},
     {url = "https://files.pythonhosted.org/packages/d2/f4/274d1dbe96b41cf4e0efb70cbced278ffd61b5c7bb70338b62af94ccb25b/requests-2.28.2-py3-none-any.whl", hash = "sha256:64299f4909223da747622c030b781c0d7811e359c37124b4bd368fb8c6518baa"},
 ]
+"scd4x 0.0.1" = [
+    {url = "https://files.pythonhosted.org/packages/84/57/ecd09e713f5bec85006ddf7163ee7de3c2cfa903b184546c7c3f702f8978/scd4x-0.0.1-py3-none-any.whl", hash = "sha256:d59c4b6a220a67fd85cc75d48bf17ce10c737b35f6d1b400b55ae255596ca2f3"},
+    {url = "https://files.pythonhosted.org/packages/9c/49/e0352da2f4ac4e523879b4db2079dd9273edc39f92b86c6af1525f52a8fc/scd4x-0.0.1.tar.gz", hash = "sha256:f9c8aefcb6cc95153f7b1538dbf152286e420ef6e552f7590f97c6497b30290d"},
+    {url = "https://files.pythonhosted.org/packages/e9/e4/8608654a8e8c3b19e8fb02b287d1cb301765cc579649b65fb62bfa0d6b3e/scd4x-0.0.1-py2-none-any.whl", hash = "sha256:10b91bff7b295a8522096fb28551a3bc78e12e548d43a5c11e2fa5cefff60453"},
+]
 "setuptools 67.5.0" = [
     {url = "https://files.pythonhosted.org/packages/1c/d2/03de0cd0d9b8c45a014da08a74419350c127b7c87b794c08d4af1549988c/setuptools-67.5.0.tar.gz", hash = "sha256:113ff8d482b826d2f3b99f26adb1fe505e526a94a08e68cdf392d1dff9ce0595"},
     {url = "https://files.pythonhosted.org/packages/f8/1e/9f5d850734b5acb29b7616b9faa1b59ab6dd159b53b36d305abb8eb416e2/setuptools-67.5.0-py3-none-any.whl", hash = "sha256:9f0004c0daa3d41ef4465934a89498da3eef994039f48845d6eb8202aa13b2e9"},
@@ -436,6 +477,10 @@ content_hash = "sha256:bd776002bc3aa55709cfb3bccbcd0ac3ceb0ebd0153771e6eaf655101
 "six 1.16.0" = [
     {url = "https://files.pythonhosted.org/packages/71/39/171f1c67cd00715f190ba0b100d606d440a28c93c7714febeca8b79af85e/six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
     {url = "https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
+]
+"smbus2 0.4.2" = [
+    {url = "https://files.pythonhosted.org/packages/71/2f/73aad66cdee8d4b94068bbc80164aa6a24b3f83541de7b04974438fd70e6/smbus2-0.4.2-py2.py3-none-any.whl", hash = "sha256:50f3c78e436b42a9583948be06961a8104cf020ebad5edfaaf2657528bef0818"},
+    {url = "https://files.pythonhosted.org/packages/7c/01/18a9c3fccc2ddc0af16ddbe52aadc4585fbd1e7ae4ee32e780abbfc7fc97/smbus2-0.4.2.tar.gz", hash = "sha256:634541ed794068a822fe7499f1577468b9d4641b68dd9bfb6d0eb7270f4d2a32"},
 ]
 "tabulate 0.9.0" = [
     {url = "https://files.pythonhosted.org/packages/40/44/4a5f08c96eb108af5cb50b41f76142f0afa346dfa99d5296fe7202a11854/tabulate-0.9.0-py3-none-any.whl", hash = "sha256:024ca478df22e9340661486f85298cff5f6dcdba14f3813e8830015b9ed1948f"},

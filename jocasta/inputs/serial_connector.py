@@ -13,10 +13,12 @@ import json
 import logging
 from dataclasses import dataclass
 from json import JSONDecodeError
+from typing import Optional
 
 import serial
 import os.path
 import time
+from pydantic import BaseModel
 
 
 # usual linux ports
@@ -31,6 +33,12 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+
+class ArduinoReading(BaseModel):
+    temperature: float
+    humidity: float
+    light: float
 
 
 @dataclass
@@ -68,12 +76,17 @@ class ArduinoSensorConnector:
             logger.debug(f'Attempt {i}: Received: {raw_serial}')
 
             if self.json_data and raw_serial:
-                try:
-                    return json.loads(raw_serial)
-                except JSONDecodeError:
-                    logger.debug(f'Failed to decode to JSON: {raw_serial}')
+                if reading := self.convert_to_reading(raw_serial):
+                    return reading
             else:
                 logger.debug('Failed to decode anything')
+
+    def convert_to_reading(self, raw_serial) -> Optional[ArduinoReading]:
+        try:
+            return ArduinoReading(**json.loads(raw_serial))
+        except JSONDecodeError:
+            logger.debug(f'Failed to decode to JSON: {raw_serial}')
+        return None
 
 
 def _detect_port():
