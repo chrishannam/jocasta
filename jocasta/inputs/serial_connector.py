@@ -86,7 +86,7 @@ def _detect_port():
             device_path = device
 
     if not device_path:
-        # lets try osx stuff
+        # let's try osx stuff
         for file_name in glob.glob1('/dev', 'tty.usbserial-*'):
             device_path = SERIAL_PORT_PATH_ROOT + file_name
     return device_path
