@@ -1,0 +1,12 @@
+click
+confluent-kafka
+fastapi
+influxdb-client
+psutil
+pyserial
+tabulate
+tapo-plug
+pycrypto>=2.6.1
+pycryptodome>=3.17
+scd4x>=0.0.1
+uvicorn[standard]
