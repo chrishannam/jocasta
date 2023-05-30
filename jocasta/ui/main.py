@@ -1,5 +1,8 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+from datetime import datetime
 import json
 
 app = FastAPI()
@@ -25,9 +28,11 @@ TEMPLATE = """
     <![endif]-->
   </head>
   <body>
+    <h1>Last Run: {last_run}</h1>
     <h1>Temperature: {temperature}</h1>
     <h1>Light: {light}</h1>
     <h1>Humidity: {humidity}</h1>
+    <h1>Current Server Time: {now}</h1>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -39,7 +44,9 @@ TEMPLATE = """
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-
-    with open('/tmp/sensor_data.json') as json_file:
+    sensor_file = '/tmp/sensor_data.json'
+    with open(sensor_file) as json_file:
         data = json.load(json_file)
+        data['last_run'] = datetime.fromtimestamp(os.path.getmtime(sensor_file)).isoformat(' ', 'seconds')
+        data['now'] = str(datetime.now().isoformat(' ', 'seconds'))
     return TEMPLATE.format(**data)
