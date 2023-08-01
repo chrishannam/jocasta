@@ -14,7 +14,8 @@ TEMPLATE = """
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <!-- The above 3 meta tags *must* come first in the head; any other
+    head content must come *after* these tags -->
     <title>Bootstrap 101 Template</title>
 
     <!-- Bootstrap -->
@@ -29,7 +30,7 @@ TEMPLATE = """
   </head>
   <body>
     <h1>Last Run: {last_run}</h1>
-    <h1>Temperature: {temperature}</h1>
+    <h1>Temperature: {temperature}c</h1>
     <h1>Light: {light}</h1>
     <h1>Humidity: {humidity}</h1>
     <h1>Current Server Time: {now}</h1>
@@ -42,11 +43,12 @@ TEMPLATE = """
 </html>
 """
 
+
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    sensor_file = '/tmp/sensor_data.json'
+    sensor_file = "/tmp/sensor_data.json"
     with open(sensor_file) as json_file:
         data = json.load(json_file)
-        data['last_run'] = datetime.fromtimestamp(os.path.getmtime(sensor_file)).isoformat(' ', 'seconds')
-        data['now'] = str(datetime.now().isoformat(' ', 'seconds'))
+        data["last_run"] = datetime.fromtimestamp(os.path.getmtime(sensor_file)).isoformat(" ", "seconds")
+        data["now"] = str(datetime.now().isoformat(" ", "seconds"))
     return TEMPLATE.format(**data)

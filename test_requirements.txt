@@ -1,8 +1,7 @@
-
+-r requirements.txt
 deepdiff
-pdm
 pre-commit
-pytest
-pytest-cov
 prettytable
 pydantic
+pytest
+pytest-cov
