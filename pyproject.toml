@@ -42,7 +42,7 @@ authors = ["Chris Hannan <ch@chrishannam.co.uk>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.8"
 pyserial = "^3.5"
 
 [tool.poetry.group.dev.dependencies]
