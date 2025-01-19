@@ -53,7 +53,8 @@ class Controller:
 
         return Readings(
             arduino=self.inputs.get_arduino_reading(),
-            tapo=self.inputs.get_tapo_plug_reading(),
+            #tapo=self.inputs.get_tapo_plug_reading(),
+            tapo=None,
             garden=self.inputs.get_garden_co2_reading(),
         )
 

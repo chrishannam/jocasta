@@ -33,9 +33,9 @@ from jocasta.outputs.influxdb import InfluxDBConfiguration
 from jocasta.outputs.influxdb import InfluxDBConnector
 from jocasta.outputs.kafka import KafkaConfiguration
 from jocasta.outputs.kafka import KafkaConnector
-from jocasta.inputs.tapo import TapoConfiguration
-from jocasta.inputs.tapo import TapoConnector
-from jocasta.inputs.tapo import TapoPlug
+#from jocasta.inputs.tapo import TapoConfiguration
+#from jocasta.inputs.tapo import TapoConnector
+#from jocasta.inputs.tapo import TapoPlug
 from jocasta.inputs.co2 import CO2Sensor
 from jocasta.inputs.serial_connector import ArduinoConfiguration
 from jocasta.inputs.serial_connector import ArduinoSensorConnector
@@ -78,7 +78,7 @@ class OutputConnectors:
 class InputConnectors:
     arduino: Union[ArduinoSensorConnector, None] = None
     garden_co2: Union[CO2Sensor, None] = None
-    tapo_plugs: Union[TapoConnector, None] = None
+    #tapo_plugs: Union[TapoConnector, None] = None
 
     def get_arduino_reading(self):
         if self.arduino:
@@ -92,11 +92,11 @@ class InputConnectors:
             return self.garden_co2.get_reading()
         return None
 
-    def get_tapo_plug_reading(self):
-        if self.tapo_plugs:
-            logger.info('Fetching from Tapo Plugs')
-            return self.tapo_plugs.get_reading()
-        return None
+    #def get_tapo_plug_reading(self):
+    #    if self.tapo_plugs:
+    #        logger.info('Fetching from Tapo Plugs')
+    #        return self.tapo_plugs.get_reading()
+    #    return None
 
 
 @dataclass
@@ -144,7 +144,7 @@ def load_config(filename=None) -> Configuration:
 
         elif section == 'file_system':
             configuration.outputs.file_system = FileSystemConnector(
-                FileSystemConfiguration(config[section]['filename'])
+                FileSystemConfiguration(config[section]['file_name'])
             )
 
         # Inputs
@@ -156,19 +156,19 @@ def load_config(filename=None) -> Configuration:
 
         elif section == 'tapo':
             plugs = []
-            for plug in config[section].get('plugs', '').split(','):
-                plugs.append(
-                    TapoPlug(
-                        name=plug.split(':')[0],
-                        ipaddress=plug.split(':')[1],
-                    )
-                )
+            #for plug in config[section].get('plugs', '').split(','):
+            #    plugs.append(
+            #        TapoPlug(
+            #            name=plug.split(':')[0],
+            #            ipaddress=plug.split(':')[1],
+            #        )
+             #   )
 
-            configuration.inputs.tapo_plugs = TapoConnector(TapoConfiguration(
-                email=config[section]['email'],
-                password=config[section]['password'],
-                plugs=plugs,
-            ))
+            #configuration.inputs.tapo_plugs = TapoConnector(TapoConfiguration(
+            #    email=config[section]['email'],
+            #    password=config[section]['password'],
+            #    plugs=plugs,
+            #))
 
         elif section == 'local':
             configuration.configuration = LocalConfiguration(
