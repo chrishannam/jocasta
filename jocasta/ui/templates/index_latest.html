@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Readings</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+        .number-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .card {
+            width: 100%;
+            max-width: 500px;
+            margin: 10px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .card-body {
+            text-align: center;
+        }
+        .reading-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #495057;
+        }
+        .reading-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .icon {
+            font-size: 3rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        /* Responsive design for smaller screens */
+        @media (max-width: 768px) {
+            .card {
+                max-width: 100%;
+                margin: 5px;
+                padding: 15px;
+            }
+            .reading-title {
+                font-size: 1.2rem;
+            }
+            .reading-value {
+                font-size: 1.8rem;
+            }
+            .icon {
+                font-size: 2.5rem;
+            }
+            .plug-status {
+                font-size: 1.3rem;
+            }
+        }
+        .button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        /* Plug Status Display */
+        .plug-status {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 30px;
+        }
+        .plug-on {
+            color: green;
+        }
+        .plug-off {
+            color: red;
+        }
+    </style>
+    <meta http-equiv="refresh" content="60">
+</head>
+<body>
+
+<div class="container number-container">
+    <!-- Sensor Cards -->
+    <div class="card">
+        <div class="card-body">
+	    <div class="icon"><i class="fas fa-thermometer-half"></i></div>
+            <div class="reading-title">Temperature</div>
+            <div class="reading-value">{{ data['temperature'] }}°C</div>
+        </div>
+    </div>
+
+    <!-- Plug Status -->
+    <div class="card plug-status">
+        <div class="card-body">
+            <div class="icon">
+                {% if device_on %}
+                    🟢
+                {% else %}
+                    🔴
+                {% endif %}
+            </div>
+            <div class="reading-title">Oil Heater Status</div>
+            <div class="reading-value {% if device_on %}plug-on{% else %}plug-off{% endif %}">
+                {% if device_on %}
+                    On
+                {% else %}
+                    Off
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Button to Toggle Tapo Plug -->
+    <div class="button-container">
+        <form action="/toggle_plug" method="POST">
+            <button type="submit" class="btn btn-primary">Oil Heater Toggle</button>
+        </form>
+    </div>
+    <!-- Monthly cost card -->
+        <div class="card">
+        <div class="card-body">
+            <div class="icon">⚡</div>
+            <div class="reading-title">Monthly Cost</div>
+            <div class="reading-value">£{{ monthly_cost }}</div>
+        </div>
+        </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="icon">💧</div>
+            <div class="reading-title">Humidity</div>
+            <div class="reading-value">{{ data['humidity'] }}%</div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="icon">🔆</div>
+            <div class="reading-title">Light</div>
+            <div class="reading-value">{{ data['light'] }} lux</div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

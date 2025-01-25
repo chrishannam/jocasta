@@ -1,6 +1,6 @@
 click
 confluent-kafka
-fastapi
+flask[async]
 influxdb-client
 psutil
 pyserial

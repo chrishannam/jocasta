@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Auto-refresh every 60 seconds -->
+    <meta http-equiv="refresh" content="60">
+    <title>Sensor Readings</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+        .number-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .card {
+            width: 100%;
+            max-width: 500px;
+            margin: 10px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-body {
+            text-align: center;
+        }
+        .reading-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #495057;
+        }
+        .reading-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .icon {
+            font-size: 3rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        /* Responsive design for smaller screens */
+        @media (max-width: 768px) {
+            .reading-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container number-container">
+    <!-- Humidity Card -->
+    <div class="card">
+        <div class="card-body">
+            <div class="icon">💧</div>
+            <div class="reading-title">Humidity</div>
+            <div class="reading-value">{{ data['humidity'] }}%</div>
+        </div>
+    </div>
+    <!-- Light Card -->
+    <div class="card">
+        <div class="card-body">
+            <div class="icon">🔆</div>
+            <div class="reading-title">Light</div>
+            <div class="reading-value">{{ data['light'] }} lux</div>
+        </div>
+    </div>
+    <!-- Temperature Card -->
+    <div class="card">
+        <div class="card-body">
+            <div class="icon">🌡️</div>
+            <div class="reading-title">Temperature</div>
+            <div class="reading-value">{{ data['temperature'] }}°C</div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
