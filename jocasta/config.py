@@ -52,6 +52,12 @@ HOME: Path = Path.home()
 CONFIG_FILE_NAME: str = 'jocasta.ini'
 
 
+URL = 'http://192.168.0.61:8086/'
+BUCKET = 'sensors'
+TOKEN = 'C5S8MYBsMqMPJzwprQVbCigBxsut-cVBYuSXyemw_XbP5NWjH4HM03l8I15j1sBx24vLuUXJGsfDBjOe6zQGpQ=='
+ORG = 'Home'
+
+
 @dataclass
 class LocalConfiguration:
     location: Optional[str] = None

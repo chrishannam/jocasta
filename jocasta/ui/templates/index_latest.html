@@ -7,6 +7,35 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
+.modern-button {
+	min-height: nowrap;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.2);
+    transition: all 0.2s ease-in-out;
+    width: 100%;
+        flex: 1 1 100%;
+    min-width: 150px;
+    text-align: center;
+}
+
+.modern-button:hover {
+    background: linear-gradient(135deg, #0056b3, #00408a);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 123, 255, 0.3);
+}
+
+@media (max-width: 576px) {
+    .modern-button {
+        font-size: 0.9rem;
+        padding: 10px 16px;
+    }
+}
         body {
             background-color: #f0f2f5;
         }
@@ -85,12 +114,42 @@
 <body>
 
 <div class="container number-container">
+
+    <!-- Modern Toggle Buttons -->
+<div class="button-container row justify-content-center d-flex flex-wrap justify-content-center gap-2">
+    <form action="/toggle_plug" method="POST" class="col-6 col-sm-5 col-md-4 col-lg-3 p-2">
+        <input type="hidden" name="device_id" value="1">
+        <button type="submit" class="modern-button btn-block">Toggle Heater</button>
+    </form>
+    <form action="/toggle_plug" method="POST" class="col-6 col-sm-5 col-md-4 col-lg-3 p-2">
+        <input type="hidden" name="device_id" value="2">
+        <button type="submit" class="modern-button btn-block">Toggle Heater</button>
+    </form>
+    <form action="/toggle_plug" method="POST" class="col-6 col-sm-5 col-md-4 col-lg-3 p-2">
+        <input type="hidden" name="device_id" value="3">
+        <button type="submit" class="modern-button btn-block">Toggle Heater</button>
+    </form>
+    <form action="/toggle_plug" method="POST" class="col-6 col-sm-5 col-md-4 col-lg-3 p-2">
+        <input type="hidden" name="device_id" value="4">
+        <button type="submit" class="modern-button btn-block">Toggle Heater</button>
+    </form>
+</div>
+
+
     <!-- Sensor Cards -->
     <div class="card">
         <div class="card-body">
 	    <div class="icon"><i class="fas fa-thermometer-half"></i></div>
             <div class="reading-title">Temperature</div>
             <div class="reading-value">{{ data['temperature'] }}°C</div>
+        </div>
+    </div>
+        <!-- Sensor Cards -->
+    <div class="card">
+        <div class="card-body">
+            <div class="icon"><i class="fas fa-thermometer-half"></i></div>
+            <div class="reading-title">External Temperature</div>
+            <div class="reading-value">{{ temp }}°C</div>
         </div>
     </div>
 
@@ -104,7 +163,7 @@
                     🔴
                 {% endif %}
             </div>
-            <div class="reading-title">Oil Heater Status</div>
+            <div class="reading-title">Fan Status</div>
             <div class="reading-value {% if device_on %}plug-on{% else %}plug-off{% endif %}">
                 {% if device_on %}
                     On
@@ -118,14 +177,15 @@
     <!-- Button to Toggle Tapo Plug -->
     <div class="button-container">
         <form action="/toggle_plug" method="POST">
-            <button type="submit" class="btn btn-primary">Oil Heater Toggle</button>
+            <button type="submit" class="btn btn-primary">Heater Toggle</button>
         </form>
     </div>
+
     <!-- Monthly cost card -->
         <div class="card">
         <div class="card-body">
             <div class="icon">⚡</div>
-            <div class="reading-title">Monthly Cost</div>
+	    <div class="reading-title">Monthly Cost</div>
             <div class="reading-value">£{{ monthly_cost }}</div>
         </div>
         </div>
